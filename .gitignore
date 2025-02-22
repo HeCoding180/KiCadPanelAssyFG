@@ -1,0 +1,8 @@
+# Ignore vscode directory
+.vs/
+.vscode/
+
+# Ignore Compilation files
+bin/
+obj/
+
