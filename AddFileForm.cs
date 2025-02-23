@@ -36,13 +36,15 @@ namespace KiCad_Panel_Assembly_Files_Generator
                 DwmSetWindowAttribute(Handle, 20, new[] { 1 }, 4);
         }
 
-        public AddFileForm(string title, string namePlaceholderText, bool IsPlacementFileForm)
+        public AddFileForm(string title, string nameText, string fileText, bool IsPlacementFileForm)
         {
             InitializeComponent();
 
             this.Text = title;
 
-            lName.Text = namePlaceholderText;
+            lName.Text = nameText;
+
+            lFile.Text = fileText;
 
             // Default dialog result
             this.DialogResult = DialogResult.Cancel;

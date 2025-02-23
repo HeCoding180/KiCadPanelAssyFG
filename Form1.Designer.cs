@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InputFilesForm));
             panel1 = new Panel();
             mainSplitcontainer = new SplitContainer();
             bRemoveDesign = new Button();
@@ -75,7 +76,7 @@
             mainSplitcontainer.Panel2.Controls.Add(placementsListBox);
             mainSplitcontainer.Panel2.Controls.Add(lPlacementPos);
             mainSplitcontainer.Size = new Size(784, 413);
-            mainSplitcontainer.SplitterDistance = 377;
+            mainSplitcontainer.SplitterDistance = 389;
             mainSplitcontainer.TabIndex = 0;
             // 
             // bRemoveDesign
@@ -120,7 +121,7 @@
             designListBox.ItemHeight = 15;
             designListBox.Location = new Point(12, 34);
             designListBox.Name = "designListBox";
-            designListBox.Size = new Size(350, 333);
+            designListBox.Size = new Size(362, 333);
             designListBox.TabIndex = 1;
             designListBox.DrawItem += ListBox_DrawItem;
             designListBox.MeasureItem += ListBox_MeasureItem;
@@ -179,7 +180,7 @@
             placementsListBox.ItemHeight = 15;
             placementsListBox.Location = new Point(14, 34);
             placementsListBox.Name = "placementsListBox";
-            placementsListBox.Size = new Size(377, 333);
+            placementsListBox.Size = new Size(365, 333);
             placementsListBox.TabIndex = 4;
             placementsListBox.DrawItem += ListBox_DrawItem;
             placementsListBox.MeasureItem += ListBox_MeasureItem;
@@ -216,9 +217,9 @@
             ClientSize = new Size(784, 461);
             Controls.Add(bExport);
             Controls.Add(panel1);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(500, 300);
             Name = "InputFilesForm";
-            ShowIcon = false;
             Text = "KiCad Panel Assembly Files Generator";
             panel1.ResumeLayout(false);
             mainSplitcontainer.Panel1.ResumeLayout(false);

@@ -118,7 +118,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
 
         private void bAddDesign_Click(object sender, EventArgs e)
         {
-            AddFileForm addFileForm = new AddFileForm("Add new Design", "Design Name", false);
+            AddFileForm addFileForm = new AddFileForm("Add new Design", "Design Name", "BOM File (.csv)", false);
 
             if (addFileForm.ShowDialog() == DialogResult.OK)
             {
@@ -133,7 +133,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
 
         private void bAddPlacements_Click(object sender, EventArgs e)
         {
-            AddFileForm addFileForm = new AddFileForm("Add new Placement", "Placement Name", true);
+            AddFileForm addFileForm = new AddFileForm("Add new Placement", "Placement Name", "Component Placement File (.csv)", true);
 
             if (addFileForm.ShowDialog() == DialogResult.OK)
             {
