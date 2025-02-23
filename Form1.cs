@@ -6,14 +6,16 @@ namespace KiCad_Panel_Assembly_Files_Generator
 {
     public partial class InputFilesForm : Form
     {
-        readonly bool GraphicsDebugEnabled = false;
+        // Public readonly variables
+        public readonly bool GraphicsDebugEnabled = false;
+
+        // Private readonly variables
+        private static readonly Rectangle IconButtonImageBounds = new Rectangle(7, 7, 16, 16);
 
         // Darkmode title bar
         // Source: https://stackoverflow.com/a/64927217
         [DllImport("DwmApi")]
         private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, int[] attrValue, int attrSize);
-
-        private static readonly Rectangle IconButtonImageBounds = new Rectangle(7, 7, 16, 16);
 
         protected override void OnHandleCreated(EventArgs e)
         {
@@ -111,12 +113,17 @@ namespace KiCad_Panel_Assembly_Files_Generator
 
         private void designListBox_SelectedIndexChanged(object sender, EventArgs e)
         {
-
+            MessageBox.Show("Selected Index: " + designListBox.SelectedIndex.ToString());
         }
 
         private void bAddDesign_Click(object sender, EventArgs e)
         {
+            AddFileForm addFileForm = new AddFileForm("Add new Design", "Design Name", false);
 
+            if (addFileForm.ShowDialog() == DialogResult.OK)
+            {
+                
+            }
         }
 
         private void bRemoveDesign_Click(object sender, EventArgs e)
@@ -126,7 +133,12 @@ namespace KiCad_Panel_Assembly_Files_Generator
 
         private void bAddPlacements_Click(object sender, EventArgs e)
         {
+            AddFileForm addFileForm = new AddFileForm("Add new Placement", "Placement Name", true);
 
+            if (addFileForm.ShowDialog() == DialogResult.OK)
+            {
+
+            }
         }
 
         private void bRemovePlacement_Click(object sender, EventArgs e)
