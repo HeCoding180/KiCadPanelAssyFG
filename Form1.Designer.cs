@@ -29,92 +29,102 @@
         private void InitializeComponent()
         {
             panel1 = new Panel();
-            splitContainer1 = new SplitContainer();
+            mainSplitcontainer = new SplitContainer();
             bRemoveDesign = new Button();
             bAddDesign = new Button();
             designListBox = new ListBox();
             lDesigns = new Label();
-            lPlacementPos = new Label();
-            bExport = new Button();
             bRemovePlacement = new Button();
             bAddPlacements = new Button();
             placementsListBox = new ListBox();
+            lPlacementPos = new Label();
+            bExport = new Button();
             panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
-            splitContainer1.Panel1.SuspendLayout();
-            splitContainer1.Panel2.SuspendLayout();
-            splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)mainSplitcontainer).BeginInit();
+            mainSplitcontainer.Panel1.SuspendLayout();
+            mainSplitcontainer.Panel2.SuspendLayout();
+            mainSplitcontainer.SuspendLayout();
             SuspendLayout();
             // 
             // panel1
             // 
             panel1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            panel1.Controls.Add(splitContainer1);
+            panel1.Controls.Add(mainSplitcontainer);
             panel1.Location = new Point(0, 0);
             panel1.Name = "panel1";
             panel1.Size = new Size(784, 413);
             panel1.TabIndex = 0;
             // 
-            // splitContainer1
+            // mainSplitcontainer
             // 
-            splitContainer1.Dock = DockStyle.Fill;
-            splitContainer1.Location = new Point(0, 0);
-            splitContainer1.Name = "splitContainer1";
+            mainSplitcontainer.Dock = DockStyle.Fill;
+            mainSplitcontainer.Location = new Point(0, 0);
+            mainSplitcontainer.Name = "mainSplitcontainer";
             // 
-            // splitContainer1.Panel1
+            // mainSplitcontainer.Panel1
             // 
-            splitContainer1.Panel1.Controls.Add(bRemoveDesign);
-            splitContainer1.Panel1.Controls.Add(bAddDesign);
-            splitContainer1.Panel1.Controls.Add(designListBox);
-            splitContainer1.Panel1.Controls.Add(lDesigns);
+            mainSplitcontainer.Panel1.Controls.Add(bRemoveDesign);
+            mainSplitcontainer.Panel1.Controls.Add(bAddDesign);
+            mainSplitcontainer.Panel1.Controls.Add(designListBox);
+            mainSplitcontainer.Panel1.Controls.Add(lDesigns);
             // 
-            // splitContainer1.Panel2
+            // mainSplitcontainer.Panel2
             // 
-            splitContainer1.Panel2.Controls.Add(bRemovePlacement);
-            splitContainer1.Panel2.Controls.Add(bAddPlacements);
-            splitContainer1.Panel2.Controls.Add(placementsListBox);
-            splitContainer1.Panel2.Controls.Add(lPlacementPos);
-            splitContainer1.Size = new Size(784, 413);
-            splitContainer1.SplitterDistance = 377;
-            splitContainer1.TabIndex = 0;
+            mainSplitcontainer.Panel2.Controls.Add(bRemovePlacement);
+            mainSplitcontainer.Panel2.Controls.Add(bAddPlacements);
+            mainSplitcontainer.Panel2.Controls.Add(placementsListBox);
+            mainSplitcontainer.Panel2.Controls.Add(lPlacementPos);
+            mainSplitcontainer.Size = new Size(784, 413);
+            mainSplitcontainer.SplitterDistance = 377;
+            mainSplitcontainer.TabIndex = 0;
             // 
             // bRemoveDesign
             // 
             bRemoveDesign.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             bRemoveDesign.BackColor = Color.FromArgb(31, 31, 31);
+            bRemoveDesign.BackgroundImageLayout = ImageLayout.Zoom;
+            bRemoveDesign.Enabled = false;
             bRemoveDesign.FlatAppearance.BorderColor = Color.FromArgb(66, 66, 66);
             bRemoveDesign.FlatStyle = FlatStyle.Flat;
-            bRemoveDesign.Location = new Point(46, 373);
+            bRemoveDesign.Location = new Point(48, 378);
             bRemoveDesign.Name = "bRemoveDesign";
-            bRemoveDesign.Size = new Size(28, 27);
+            bRemoveDesign.Size = new Size(30, 30);
             bRemoveDesign.TabIndex = 3;
             bRemoveDesign.UseVisualStyleBackColor = false;
+            bRemoveDesign.Click += bRemoveDesign_Click;
+            bRemoveDesign.Paint += RemoveButton_Paint;
             // 
             // bAddDesign
             // 
             bAddDesign.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             bAddDesign.BackColor = Color.FromArgb(31, 31, 31);
+            bAddDesign.BackgroundImageLayout = ImageLayout.Zoom;
             bAddDesign.FlatAppearance.BorderColor = Color.FromArgb(66, 66, 66);
             bAddDesign.FlatStyle = FlatStyle.Flat;
-            bAddDesign.Location = new Point(12, 373);
+            bAddDesign.Location = new Point(12, 378);
             bAddDesign.Name = "bAddDesign";
-            bAddDesign.Size = new Size(28, 27);
+            bAddDesign.Size = new Size(30, 30);
             bAddDesign.TabIndex = 2;
             bAddDesign.UseVisualStyleBackColor = false;
+            bAddDesign.Click += bAddDesign_Click;
+            bAddDesign.Paint += AddButton_Paint;
             // 
             // designListBox
             // 
             designListBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             designListBox.BackColor = Color.FromArgb(31, 31, 31);
             designListBox.BorderStyle = BorderStyle.FixedSingle;
+            designListBox.DrawMode = DrawMode.OwnerDrawVariable;
             designListBox.ForeColor = SystemColors.Control;
-            designListBox.FormattingEnabled = true;
             designListBox.IntegralHeight = false;
             designListBox.ItemHeight = 15;
             designListBox.Location = new Point(12, 34);
             designListBox.Name = "designListBox";
-            designListBox.Size = new Size(350, 328);
+            designListBox.Size = new Size(350, 333);
             designListBox.TabIndex = 1;
+            designListBox.DrawItem += ListBox_DrawItem;
+            designListBox.MeasureItem += ListBox_MeasureItem;
+            designListBox.SelectedIndexChanged += designListBox_SelectedIndexChanged;
             // 
             // lDesigns
             // 
@@ -125,6 +135,54 @@
             lDesigns.Size = new Size(51, 15);
             lDesigns.TabIndex = 0;
             lDesigns.Text = "Designs:";
+            // 
+            // bRemovePlacement
+            // 
+            bRemovePlacement.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            bRemovePlacement.BackColor = Color.FromArgb(31, 31, 31);
+            bRemovePlacement.BackgroundImageLayout = ImageLayout.Zoom;
+            bRemovePlacement.Enabled = false;
+            bRemovePlacement.FlatAppearance.BorderColor = Color.FromArgb(66, 66, 66);
+            bRemovePlacement.FlatStyle = FlatStyle.Flat;
+            bRemovePlacement.Location = new Point(50, 378);
+            bRemovePlacement.Name = "bRemovePlacement";
+            bRemovePlacement.Size = new Size(30, 30);
+            bRemovePlacement.TabIndex = 6;
+            bRemovePlacement.UseVisualStyleBackColor = false;
+            bRemovePlacement.Click += bRemovePlacement_Click;
+            bRemovePlacement.Paint += RemoveButton_Paint;
+            // 
+            // bAddPlacements
+            // 
+            bAddPlacements.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            bAddPlacements.BackColor = Color.FromArgb(31, 31, 31);
+            bAddPlacements.BackgroundImageLayout = ImageLayout.Zoom;
+            bAddPlacements.Enabled = false;
+            bAddPlacements.FlatAppearance.BorderColor = Color.FromArgb(66, 66, 66);
+            bAddPlacements.FlatStyle = FlatStyle.Flat;
+            bAddPlacements.Location = new Point(14, 378);
+            bAddPlacements.Name = "bAddPlacements";
+            bAddPlacements.Size = new Size(30, 30);
+            bAddPlacements.TabIndex = 5;
+            bAddPlacements.UseVisualStyleBackColor = false;
+            bAddPlacements.Click += bAddPlacements_Click;
+            bAddPlacements.Paint += AddButton_Paint;
+            // 
+            // placementsListBox
+            // 
+            placementsListBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            placementsListBox.BackColor = Color.FromArgb(31, 31, 31);
+            placementsListBox.BorderStyle = BorderStyle.FixedSingle;
+            placementsListBox.DrawMode = DrawMode.OwnerDrawVariable;
+            placementsListBox.ForeColor = SystemColors.Control;
+            placementsListBox.IntegralHeight = false;
+            placementsListBox.ItemHeight = 15;
+            placementsListBox.Location = new Point(14, 34);
+            placementsListBox.Name = "placementsListBox";
+            placementsListBox.Size = new Size(377, 333);
+            placementsListBox.TabIndex = 4;
+            placementsListBox.DrawItem += ListBox_DrawItem;
+            placementsListBox.MeasureItem += ListBox_MeasureItem;
             // 
             // lPlacementPos
             // 
@@ -146,47 +204,9 @@
             bExport.Location = new Point(7, 419);
             bExport.Name = "bExport";
             bExport.Size = new Size(770, 35);
-            bExport.TabIndex = 1;
+            bExport.TabIndex = 7;
             bExport.Text = "Export BOM and Placement File";
             bExport.UseVisualStyleBackColor = false;
-            // 
-            // bRemovePlacement
-            // 
-            bRemovePlacement.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            bRemovePlacement.BackColor = Color.FromArgb(31, 31, 31);
-            bRemovePlacement.FlatAppearance.BorderColor = Color.FromArgb(66, 66, 66);
-            bRemovePlacement.FlatStyle = FlatStyle.Flat;
-            bRemovePlacement.Location = new Point(48, 373);
-            bRemovePlacement.Name = "bRemovePlacement";
-            bRemovePlacement.Size = new Size(28, 27);
-            bRemovePlacement.TabIndex = 6;
-            bRemovePlacement.UseVisualStyleBackColor = false;
-            // 
-            // bAddPlacements
-            // 
-            bAddPlacements.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            bAddPlacements.BackColor = Color.FromArgb(31, 31, 31);
-            bAddPlacements.FlatAppearance.BorderColor = Color.FromArgb(66, 66, 66);
-            bAddPlacements.FlatStyle = FlatStyle.Flat;
-            bAddPlacements.Location = new Point(14, 373);
-            bAddPlacements.Name = "bAddPlacements";
-            bAddPlacements.Size = new Size(28, 27);
-            bAddPlacements.TabIndex = 5;
-            bAddPlacements.UseVisualStyleBackColor = false;
-            // 
-            // placementsListBox
-            // 
-            placementsListBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            placementsListBox.BackColor = Color.FromArgb(31, 31, 31);
-            placementsListBox.BorderStyle = BorderStyle.FixedSingle;
-            placementsListBox.ForeColor = SystemColors.Control;
-            placementsListBox.FormattingEnabled = true;
-            placementsListBox.IntegralHeight = false;
-            placementsListBox.ItemHeight = 15;
-            placementsListBox.Location = new Point(14, 34);
-            placementsListBox.Name = "placementsListBox";
-            placementsListBox.Size = new Size(377, 328);
-            placementsListBox.TabIndex = 4;
             // 
             // InputFilesForm
             // 
@@ -196,16 +216,17 @@
             ClientSize = new Size(784, 461);
             Controls.Add(bExport);
             Controls.Add(panel1);
+            MinimumSize = new Size(500, 300);
             Name = "InputFilesForm";
             ShowIcon = false;
             Text = "KiCad Panel Assembly Files Generator";
             panel1.ResumeLayout(false);
-            splitContainer1.Panel1.ResumeLayout(false);
-            splitContainer1.Panel1.PerformLayout();
-            splitContainer1.Panel2.ResumeLayout(false);
-            splitContainer1.Panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
-            splitContainer1.ResumeLayout(false);
+            mainSplitcontainer.Panel1.ResumeLayout(false);
+            mainSplitcontainer.Panel1.PerformLayout();
+            mainSplitcontainer.Panel2.ResumeLayout(false);
+            mainSplitcontainer.Panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)mainSplitcontainer).EndInit();
+            mainSplitcontainer.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -213,7 +234,7 @@
 
         private Panel panel1;
         private Button bExport;
-        private SplitContainer splitContainer1;
+        private SplitContainer mainSplitcontainer;
         private Label lDesigns;
         private Label lPlacementPos;
         private ListBox designListBox;
