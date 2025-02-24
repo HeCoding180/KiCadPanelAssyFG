@@ -26,7 +26,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
         string Package { set; get; }
         PointF Position { set; get; }
         float Rotation { set; get; }
-        public PlacementPosition Side { set; get; }
+        public PlacementSide Side { set; get; }
 
         public PlacementDataLine()
         {
@@ -35,10 +35,10 @@ namespace KiCad_Panel_Assembly_Files_Generator
             Package = "";
             Position = new PointF(0, 0);
             Rotation = 0;
-            Side = PlacementPosition.Undef;
+            Side = PlacementSide.Undef;
         }
 
-        public PlacementDataLine(string reference, string value, string package, PointF pos, float rot, PlacementPosition side)
+        public PlacementDataLine(string reference, string value, string package, PointF pos, float rot, PlacementSide side)
         {
             Reference = reference;
             Value = value;
@@ -48,7 +48,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
             Side = side;
         }
 
-        public PlacementDataLine(string reference, string value, string package, float posX, float posY, float rot, PlacementPosition side)
+        public PlacementDataLine(string reference, string value, string package, float posX, float posY, float rot, PlacementSide side)
         {
             Reference = reference;
             Value = value;

@@ -17,7 +17,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
     }
     
     // Custom Enums
-    public enum PlacementPosition
+    public enum PlacementSide
     {
         Undef,
         Top,

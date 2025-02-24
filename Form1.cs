@@ -199,7 +199,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
                 }
                 else
                 {
-                    Designs[designListBox.GetItemText(designListBox.SelectedItem)].addPlacementInfo(new PlacementInfo(addFileForm.fileName, addFileForm.fileDir, addFileForm.placementPosition));
+                    Designs[designListBox.GetItemText(designListBox.SelectedItem)].addPlacementInfo(new PlacementInfo(addFileForm.fileName, addFileForm.fileDir, addFileForm.placementSide));
 
                     placementsListBox.Items.Add(addFileForm.fileName);
                 }

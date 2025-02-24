@@ -17,7 +17,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
         public string fileDir { private set; get; }
 
         public bool isPlacementFileForm { private set; get; }
-        public PlacementPosition placementPosition { private set; get; }
+        public PlacementSide placementSide { private set; get; }
 
         // Darkmode title bar
         // Source: https://stackoverflow.com/a/64927217
@@ -119,7 +119,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
             }
             else if (isPlacementFileForm)
             {
-                placementPosition = topRadioButton.Checked ? PlacementPosition.Top : PlacementPosition.Bottom;
+                placementSide = topRadioButton.Checked ? PlacementSide.Top : PlacementSide.Bottom;
             }
 
             fileName = nameTextbox.Text;

@@ -10,13 +10,13 @@ namespace KiCad_Panel_Assembly_Files_Generator
     {
         public string Name;
         public string CompPlacementFileDir;
-        public PlacementPosition Position;
+        public PlacementSide Side;
 
-        public PlacementInfo(string name, string compPlacementFileDir, PlacementPosition position)
+        public PlacementInfo(string name, string compPlacementFileDir, PlacementSide side)
         {
             Name = name;
             CompPlacementFileDir = compPlacementFileDir;
-            Position = position;
+            Side = side;
         }
     }
 
