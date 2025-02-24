@@ -44,7 +44,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
                 throw new ArgumentDataException("BOM file does not contain required headers");
             }
 
-            int DescriptionIndex = -1;
+            int ValueIndex = -1;
             int ReferencesIndex = -1;
             int FootprintIndex = -1;
             int PartNumberIndex = -1;
@@ -53,8 +53,8 @@ namespace KiCad_Panel_Assembly_Files_Generator
             {
                 if (headers[i].Contains("Value", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (DescriptionIndex == -1)
-                        DescriptionIndex = i;
+                    if (ValueIndex == -1)
+                        ValueIndex = i;
                     else
                         throw new ArgumentDataException("BOM file contains multiple copies of the same header");
                 }
@@ -85,7 +85,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
                 }
             }
 
-            if ((DescriptionIndex == -1) ||
+            if ((ValueIndex == -1) ||
                 (ReferencesIndex == -1) ||
                 (FootprintIndex == -1) ||
                 (PartNumberIndex == -1))
@@ -106,7 +106,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
                     references[i] = references[i].Trim();
                 }
 
-                outputBOM.BOMData.Add(splitBomLine[PartNumberIndex], new BOMDataLine(splitBomLine[DescriptionIndex], references, splitBomLine[FootprintIndex], splitBomLine[PartNumberIndex]));
+                outputBOM.BOMData.Add(splitBomLine[PartNumberIndex], new BOMDataLine(splitBomLine[ValueIndex], references, splitBomLine[FootprintIndex], splitBomLine[PartNumberIndex]));
             }
 
             return outputBOM;
@@ -115,7 +115,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
 
     internal class BOMDataLine
     {
-        string Description { set; get; }
+        string Value { set; get; }
         string[] Designators { set; get; }
         string Footprint { set; get; }
         string LCSC_PN { set; get; }
@@ -126,11 +126,14 @@ namespace KiCad_Panel_Assembly_Files_Generator
 
             Designators = new string[designators.Length];
             Array.Copy(designators, Designators, designators.Length);
+
+            Value = "";
+            Footprint = "";
         }
 
-        public BOMDataLine(string description, string[] designators, string footprint, string lCSC_PN)
+        public BOMDataLine(string value, string[] designators, string footprint, string lCSC_PN)
         {
-            Description = description;
+            Value = value;
             Footprint = footprint;
             LCSC_PN = lCSC_PN;
 

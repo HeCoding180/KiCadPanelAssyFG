@@ -222,7 +222,11 @@ namespace KiCad_Panel_Assembly_Files_Generator
 
         private void bExport_Click(object sender, EventArgs e)
         {
-            
+            // Read all BOM files
+            foreach (KeyValuePair<string, DesignInfo> DesignKvp in Designs)
+            {
+
+            }
         }
     }
 }
