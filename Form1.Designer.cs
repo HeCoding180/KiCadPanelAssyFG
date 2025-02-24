@@ -209,6 +209,7 @@
             bExport.TabIndex = 7;
             bExport.Text = "Export BOM and Placement File";
             bExport.UseVisualStyleBackColor = false;
+            bExport.Click += bExport_Click;
             // 
             // InputFilesForm
             // 

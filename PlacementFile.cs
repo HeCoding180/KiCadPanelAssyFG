@@ -11,14 +11,11 @@ namespace KiCad_Panel_Assembly_Files_Generator
 {
     internal class PlacementFile
     {
-        public string CompPlacementFileDir;
-        public PlacementPosition Side;
-        public Dictionary<string, PlacementDataLine> PlacementData = new Dictionary<string, PlacementDataLine>();
+        public Dictionary<string, PlacementDataLine> PlacementData { set; get; }
 
-        public PlacementFile(string compPlacementFileDir, PlacementPosition side)
+        public PlacementFile()
         {
-            CompPlacementFileDir = compPlacementFileDir;
-            Side = side;
+            PlacementData = new Dictionary<string, PlacementDataLine>();
         }
     }
 

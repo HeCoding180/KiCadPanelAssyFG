@@ -26,10 +26,14 @@ namespace KiCad_Panel_Assembly_Files_Generator
         public string BOMFileDir;
         public Dictionary<string, PlacementInfo> Placements = new Dictionary<string, PlacementInfo>();
 
+        BOMFile BOMFileData;
+
         public DesignInfo(string name, string bomFileDir)
         {
             Name = name;
             BOMFileDir = bomFileDir;
+
+            BOMFileData = new BOMFile();
         }
 
         public DesignInfo(string name, string bomFileDir, PlacementInfo[] placementInfos)
@@ -41,6 +45,8 @@ namespace KiCad_Panel_Assembly_Files_Generator
             {
                 Placements.Add(placementInfo.Name, placementInfo);
             }
+
+            BOMFileData = new BOMFile();
         }
 
         public void addPlacementInfo (PlacementInfo placementInfo)

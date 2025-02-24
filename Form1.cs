@@ -219,5 +219,10 @@ namespace KiCad_Panel_Assembly_Files_Generator
                 }
             }
         }
+
+        private void bExport_Click(object sender, EventArgs e)
+        {
+            
+        }
     }
 }
