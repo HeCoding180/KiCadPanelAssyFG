@@ -15,17 +15,6 @@ namespace KiCadPanelAssyFG
         // Private readonly variables
         private static readonly Rectangle IconButtonImageBounds = new Rectangle(7, 7, 16, 16);
 
-        // Darkmode title bar
-        // Source: https://stackoverflow.com/a/64927217
-        [DllImport("DwmApi")]
-        private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, int[] attrValue, int attrSize);
-
-        protected override void OnHandleCreated(EventArgs e)
-        {
-            if (DwmSetWindowAttribute(Handle, 19, new[] { 1 }, 4) != 0)
-                DwmSetWindowAttribute(Handle, 20, new[] { 1 }, 4);
-        }
-
         public FileOverviewForm()
         {
             InitializeComponent();

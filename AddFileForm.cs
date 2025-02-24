@@ -19,17 +19,6 @@ namespace KiCadPanelAssyFG
         public bool isPlacementFileForm { private set; get; }
         public PlacementSide placementSide { private set; get; }
 
-        // Darkmode title bar
-        // Source: https://stackoverflow.com/a/64927217
-        [DllImport("DwmApi")]
-        private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, int[] attrValue, int attrSize);
-
-        protected override void OnHandleCreated(EventArgs e)
-        {
-            if (DwmSetWindowAttribute(Handle, 19, new[] { 1 }, 4) != 0)
-                DwmSetWindowAttribute(Handle, 20, new[] { 1 }, 4);
-        }
-
         public AddFileForm(string title, string nameText, string fileText, bool IsPlacementFileForm)
         {
             InitializeComponent();
