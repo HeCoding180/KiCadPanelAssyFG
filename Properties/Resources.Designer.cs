@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace KiCad_Panel_Assembly_Files_Generator.Properties {
+namespace KiCadPanelAssyFG.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace KiCad_Panel_Assembly_Files_Generator.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("KiCad_Panel_Assembly_Files_Generator.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("KiCadPanelAssyFG.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

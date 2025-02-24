@@ -1,4 +1,4 @@
-namespace KiCad_Panel_Assembly_Files_Generator
+namespace KiCadPanelAssyFG
 {
     internal static class Program
     {
@@ -11,7 +11,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
-            Application.Run(new InputFilesForm());
+            Application.Run(new FileOverviewForm());
         }
     }
 }

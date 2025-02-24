@@ -1,6 +1,6 @@
-﻿namespace KiCad_Panel_Assembly_Files_Generator
+﻿namespace KiCadPanelAssyFG
 {
-    partial class InputFilesForm
+    partial class FileOverviewForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InputFilesForm));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FileOverviewForm));
             panel1 = new Panel();
             mainSplitcontainer = new SplitContainer();
             bRemoveDesign = new Button();
@@ -211,7 +211,7 @@
             bExport.UseVisualStyleBackColor = false;
             bExport.Click += bExport_Click;
             // 
-            // InputFilesForm
+            // FileOverviewForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -221,7 +221,7 @@
             Controls.Add(panel1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(500, 300);
-            Name = "InputFilesForm";
+            Name = "FileOverviewForm";
             Text = "KiCad Panel Assembly Files Generator";
             panel1.ResumeLayout(false);
             mainSplitcontainer.Panel1.ResumeLayout(false);

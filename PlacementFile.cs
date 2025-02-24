@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace KiCad_Panel_Assembly_Files_Generator
+namespace KiCadPanelAssyFG
 {
     internal class PlacementFile
     {

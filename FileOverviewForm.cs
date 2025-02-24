@@ -1,10 +1,10 @@
-using KiCad_Panel_Assembly_Files_Generator.Properties;
+using KiCadPanelAssyFG.Properties;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace KiCad_Panel_Assembly_Files_Generator
+namespace KiCadPanelAssyFG
 {
-    public partial class InputFilesForm : Form
+    public partial class FileOverviewForm : Form
     {
         // Public readonly variables
         public readonly bool GraphicsDebugEnabled = false;
@@ -26,7 +26,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
                 DwmSetWindowAttribute(Handle, 20, new[] { 1 }, 4);
         }
 
-        public InputFilesForm()
+        public FileOverviewForm()
         {
             InitializeComponent();
 
