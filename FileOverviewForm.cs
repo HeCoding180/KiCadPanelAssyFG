@@ -223,9 +223,14 @@ namespace KiCadPanelAssyFG
         private void bExport_Click(object sender, EventArgs e)
         {
             // Read all BOM files
-            foreach (KeyValuePair<string, DesignInfo> DesignKvp in Designs)
+            foreach (string designKey in Designs.Keys)
             {
+                Designs[designKey].parseBomFromFile();
 
+                foreach (string placementKey in Designs[designKey].Placements.Keys)
+                {
+                    Designs[designKey].Placements[placementKey].parsePlacementFromFile();
+                }
             }
         }
     }

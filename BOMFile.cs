@@ -16,17 +16,17 @@ namespace KiCadPanelAssyFG
             BOMData = new Dictionary<string, BOMDataLine>();
         }
 
-        public static BOMFile TryParse(string fileDir)
+        public static BOMFile Parse(string fileDir)
         {
-            return TryParse(File.ReadLines(fileDir));
+            return Parse(File.ReadLines(fileDir));
         }
 
-        public static BOMFile TryParse(string[] rawBomData)
+        public static BOMFile Parse(string[] rawBomData)
         {
-            return TryParse(rawBomData.AsEnumerable());
+            return Parse(rawBomData.AsEnumerable());
         }
 
-        public static BOMFile TryParse(IEnumerable<string> rawBomData)
+        public static BOMFile Parse(IEnumerable<string> rawBomData)
         {
             string[] headers = rawBomData.First().Split(";");
 

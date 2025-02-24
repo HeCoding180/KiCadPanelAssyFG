@@ -9,14 +9,23 @@ namespace KiCadPanelAssyFG
     internal class PlacementInfo
     {
         public string Name;
-        public string CompPlacementFileDir;
+        public string PlacementFileDir;
         public PlacementSide Side;
 
-        public PlacementInfo(string name, string compPlacementFileDir, PlacementSide side)
+        public PlacementFile PlacementFileData;
+
+        public PlacementInfo(string name, string placementFileDir, PlacementSide side)
         {
             Name = name;
-            CompPlacementFileDir = compPlacementFileDir;
+            PlacementFileDir = placementFileDir;
             Side = side;
+
+            PlacementFileData = new PlacementFile();
+        }
+
+        public void parsePlacementFromFile()
+        {
+            this.PlacementFileData = PlacementFile.Parse(PlacementFileDir);
         }
     }
 
@@ -26,7 +35,7 @@ namespace KiCadPanelAssyFG
         public string BOMFileDir;
         public Dictionary<string, PlacementInfo> Placements = new Dictionary<string, PlacementInfo>();
 
-        BOMFile BOMFileData;
+        public BOMFile BOMFileData;
 
         public DesignInfo(string name, string bomFileDir)
         {
@@ -57,6 +66,11 @@ namespace KiCadPanelAssyFG
         public void removePlacementInfo (string name)
         {
             Placements.Remove(name);
+        }
+
+        public void parseBomFromFile()
+        {
+            this.BOMFileData = BOMFile.Parse(BOMFileDir);
         }
     }
 }
