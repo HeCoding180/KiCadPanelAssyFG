@@ -7,15 +7,6 @@ using System.Threading.Tasks;
 
 namespace KiCad_Panel_Assembly_Files_Generator
 {
-    public class ArgumentDataException : Exception
-    {
-        public ArgumentDataException() { }
-
-        public ArgumentDataException(string message) : base(message) { }
-
-        public ArgumentDataException(string message, Exception inner) : base(message, inner) { }
-    }
-
     internal class BOMFile
     {
         public Dictionary<string, BOMDataLine> BOMData { set; get; }

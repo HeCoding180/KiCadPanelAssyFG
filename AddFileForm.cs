@@ -11,13 +11,6 @@ using System.Windows.Forms;
 
 namespace KiCad_Panel_Assembly_Files_Generator
 {
-    public enum PlacementPosition
-    {
-        Undef,
-        Top,
-        Bottom
-    }
-
     public partial class AddFileForm : Form
     {
         public string fileName { set; get; }
