@@ -184,6 +184,7 @@
             placementsListBox.TabIndex = 4;
             placementsListBox.DrawItem += ListBox_DrawItem;
             placementsListBox.MeasureItem += ListBox_MeasureItem;
+            placementsListBox.SelectedIndexChanged += placementsListBox_SelectedIndexChanged;
             // 
             // lPlacementPos
             // 
