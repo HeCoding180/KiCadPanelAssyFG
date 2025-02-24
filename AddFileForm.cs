@@ -13,6 +13,7 @@ namespace KiCad_Panel_Assembly_Files_Generator
 {
     public enum PlacementPosition
     {
+        Undef,
         Top,
         Bottom
     }
