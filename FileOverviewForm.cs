@@ -144,7 +144,7 @@ namespace KiCadPanelAssyFG
 
         private void bAddDesign_Click(object sender, EventArgs e)
         {
-            AddFileForm addFileForm = new AddFileForm("Add new Design", "Design Name", "BOM File (.csv)", false);
+            AddFileForm addFileForm = new AddFileForm("Add new Design", "Design Name", "BOM File (.csv)");
 
             if (addFileForm.ShowDialog() == DialogResult.OK)
             {
@@ -178,7 +178,7 @@ namespace KiCadPanelAssyFG
 
         private void bAddPlacements_Click(object sender, EventArgs e)
         {
-            AddFileForm addFileForm = new AddFileForm("Add new Placement", "Placement Name", "Component Placement File (.csv)", true);
+            AddFileForm addFileForm = new AddFileForm("Add new Placement", "Placement Name", "Component Placement File (.csv)");
 
             if (addFileForm.ShowDialog() == DialogResult.OK)
             {
@@ -188,7 +188,7 @@ namespace KiCadPanelAssyFG
                 }
                 else
                 {
-                    Designs[designListBox.GetItemText(designListBox.SelectedItem)].addPlacementInfo(new PlacementInfo(addFileForm.fileName, addFileForm.fileDir, addFileForm.placementSide));
+                    Designs[designListBox.GetItemText(designListBox.SelectedItem)].addPlacementInfo(new PlacementInfo(addFileForm.fileName, addFileForm.fileDir));
 
                     placementsListBox.Items.Add(addFileForm.fileName);
                 }

@@ -37,9 +37,6 @@
             bBrowse = new Button();
             nameTextboxPanel = new Panel();
             fileTextboxPanel = new Panel();
-            lPlacement = new Label();
-            topRadioButton = new RadioButton();
-            bottomRadioButton = new RadioButton();
             nameTextboxPanel.SuspendLayout();
             fileTextboxPanel.SuspendLayout();
             SuspendLayout();
@@ -94,7 +91,7 @@
             bOk.Location = new Point(12, 124);
             bOk.Name = "bOk";
             bOk.Size = new Size(100, 25);
-            bOk.TabIndex = 6;
+            bOk.TabIndex = 4;
             bOk.Text = "OK";
             bOk.UseVisualStyleBackColor = false;
             bOk.Click += bOk_Click;
@@ -107,7 +104,7 @@
             bCancel.Location = new Point(118, 124);
             bCancel.Name = "bCancel";
             bCancel.Size = new Size(100, 25);
-            bCancel.TabIndex = 7;
+            bCancel.TabIndex = 5;
             bCancel.Text = "Cancel";
             bCancel.UseVisualStyleBackColor = false;
             bCancel.Click += bCancel_Click;
@@ -148,46 +145,12 @@
             fileTextboxPanel.Size = new Size(304, 25);
             fileTextboxPanel.TabIndex = 8;
             // 
-            // lPlacement
-            // 
-            lPlacement.AutoSize = true;
-            lPlacement.Location = new Point(235, 129);
-            lPlacement.Name = "lPlacement";
-            lPlacement.Size = new Size(66, 15);
-            lPlacement.TabIndex = 9;
-            lPlacement.Text = "Placement:";
-            // 
-            // topRadioButton
-            // 
-            topRadioButton.AutoSize = true;
-            topRadioButton.Location = new Point(307, 127);
-            topRadioButton.Name = "topRadioButton";
-            topRadioButton.Size = new Size(44, 19);
-            topRadioButton.TabIndex = 4;
-            topRadioButton.TabStop = true;
-            topRadioButton.Text = "Top";
-            topRadioButton.UseVisualStyleBackColor = true;
-            // 
-            // bottomRadioButton
-            // 
-            bottomRadioButton.AutoSize = true;
-            bottomRadioButton.Location = new Point(357, 127);
-            bottomRadioButton.Name = "bottomRadioButton";
-            bottomRadioButton.Size = new Size(65, 19);
-            bottomRadioButton.TabIndex = 5;
-            bottomRadioButton.TabStop = true;
-            bottomRadioButton.Text = "Bottom";
-            bottomRadioButton.UseVisualStyleBackColor = true;
-            // 
             // AddFileForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(26, 26, 26);
             ClientSize = new Size(434, 161);
-            Controls.Add(bottomRadioButton);
-            Controls.Add(topRadioButton);
-            Controls.Add(lPlacement);
             Controls.Add(fileTextboxPanel);
             Controls.Add(nameTextboxPanel);
             Controls.Add(bBrowse);
@@ -221,8 +184,5 @@
         private Button bBrowse;
         private Panel nameTextboxPanel;
         private Panel fileTextboxPanel;
-        private Label lPlacement;
-        private RadioButton topRadioButton;
-        private RadioButton bottomRadioButton;
     }
 }

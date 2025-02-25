@@ -16,10 +16,7 @@ namespace KiCadPanelAssyFG
         public string fileName { set; get; }
         public string fileDir { private set; get; }
 
-        public bool isPlacementFileForm { private set; get; }
-        public PlacementSide placementSide { private set; get; }
-
-        public AddFileForm(string title, string nameText, string fileText, bool IsPlacementFileForm)
+        public AddFileForm(string title, string nameText, string fileText)
         {
             InitializeComponent();
 
@@ -31,15 +28,6 @@ namespace KiCadPanelAssyFG
 
             // Default dialog result
             this.DialogResult = DialogResult.Cancel;
-
-            isPlacementFileForm = IsPlacementFileForm;
-
-            if (!IsPlacementFileForm)
-            {
-                lPlacement.Hide();
-                topRadioButton.Hide();
-                bottomRadioButton.Hide();
-            }
         }
 
         private void bBrowse_Click(object sender, EventArgs e)
@@ -99,16 +87,6 @@ namespace KiCadPanelAssyFG
             {
                 MessageBox.Show("The file is not of type \".csv\"", "Invalid File Ending", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
-            }
-
-            if (isPlacementFileForm && !(topRadioButton.Checked || bottomRadioButton.Checked))
-            {
-                MessageBox.Show("Please select the placement side this file needs to get associated with (top or bottom)", "Select Placement", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-            else if (isPlacementFileForm)
-            {
-                placementSide = topRadioButton.Checked ? PlacementSide.Top : PlacementSide.Bottom;
             }
 
             fileName = nameTextbox.Text;

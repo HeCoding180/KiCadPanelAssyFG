@@ -10,15 +10,13 @@ namespace KiCadPanelAssyFG
     {
         public string Name;
         public string PlacementFileDir;
-        public PlacementSide Side;
 
         public PlacementFile PlacementFileData;
 
-        public PlacementInfo(string name, string placementFileDir, PlacementSide side)
+        public PlacementInfo(string name, string placementFileDir)
         {
             Name = name;
             PlacementFileDir = placementFileDir;
-            Side = side;
 
             PlacementFileData = new PlacementFile();
         }
