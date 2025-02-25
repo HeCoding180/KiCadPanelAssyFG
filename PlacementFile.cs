@@ -11,11 +11,11 @@ namespace KiCadPanelAssyFG
 {
     internal class PlacementFile
     {
-        public Dictionary<string, PlacementDataLine> PlacementData { set; get; }
+        public List<PlacementDataLine> PlacementData { set; get; }
 
         public PlacementFile()
         {
-            PlacementData = new Dictionary<string, PlacementDataLine>();
+            PlacementData = new List<PlacementDataLine>(0);
         }
 
         public static PlacementFile Parse(string fileDir)
@@ -30,11 +30,28 @@ namespace KiCadPanelAssyFG
 
         public static PlacementFile Parse(IEnumerable<string> rawPlacementData)
         {
-            string[] headers = rawPlacementData.First().Split(";");
+            char septChar = '\0';
+
+            string headerRow = rawPlacementData.First();
+
+            if (headerRow.Contains(';'))
+            {
+                septChar = ';';
+            }
+            else if (headerRow.Contains(','))
+            {
+                septChar = ',';
+            }
+            else
+            {
+                throw new ArgumentDataException("No valid separator character was found!");
+            }
+
+            string[] headers = headerRow.Split(septChar);
 
             if (headers.Length < 7)
             {
-                throw new ArgumentDataException("BOM file does not contain required headers");
+                throw new ArgumentDataException("Placement file does not contain required headers");
             }
 
             int ReferencesIndex = -1;
@@ -52,49 +69,49 @@ namespace KiCadPanelAssyFG
                     if (ReferencesIndex == -1)
                         ReferencesIndex = i;
                     else
-                        throw new ArgumentDataException("BOM file contains multiple copies of the same header");
+                        throw new ArgumentDataException("Placement file contains multiple copies of the same header");
                 }
                 else if (headers[i].Contains("Val", StringComparison.OrdinalIgnoreCase))
                 {
                     if (ValueIndex == -1)
                         ValueIndex = i;
                     else
-                        throw new ArgumentDataException("BOM file contains multiple copies of the same header");
+                        throw new ArgumentDataException("Placement file contains multiple copies of the same header");
                 }
                 else if (headers[i].Contains("Package", StringComparison.OrdinalIgnoreCase))
                 {
                     if (FootprintIndex == -1)
                         FootprintIndex = i;
                     else
-                        throw new ArgumentDataException("BOM file contains multiple copies of the same header");
+                        throw new ArgumentDataException("Placement file contains multiple copies of the same header");
                 }
                 else if (headers[i].Contains("PosX", StringComparison.OrdinalIgnoreCase))
                 {
                     if (PosXIndex == -1)
                         PosXIndex = i;
                     else
-                        throw new ArgumentDataException("BOM file contains multiple copies of the same header");
+                        throw new ArgumentDataException("Placement file contains multiple copies of the same header");
                 }
                 else if (headers[i].Contains("PosY", StringComparison.OrdinalIgnoreCase))
                 {
                     if (PosYIndex == -1)
                         PosYIndex = i;
                     else
-                        throw new ArgumentDataException("BOM file contains multiple copies of the same header");
+                        throw new ArgumentDataException("Placement file contains multiple copies of the same header");
                 }
                 else if (headers[i].Contains("Rot", StringComparison.OrdinalIgnoreCase))
                 {
                     if (RotationIndex == -1)
                         RotationIndex = i;
                     else
-                        throw new ArgumentDataException("BOM file contains multiple copies of the same header");
+                        throw new ArgumentDataException("Placement file contains multiple copies of the same header");
                 }
                 else if (headers[i].Contains("Side", StringComparison.OrdinalIgnoreCase))
                 {
                     if (SideIndex == -1)
                         SideIndex = i;
                     else
-                        throw new ArgumentDataException("BOM file contains multiple copies of the same header");
+                        throw new ArgumentDataException("Placement file contains multiple copies of the same header");
                 }
                 else
                 {
@@ -110,14 +127,14 @@ namespace KiCadPanelAssyFG
                 (RotationIndex == -1) ||
                 (SideIndex == -1))
             {
-                throw new ArgumentDataException("BOM file does not contain required headers");
+                throw new ArgumentDataException("Placement file does not contain required headers");
             }
 
             PlacementFile outputPlacements = new PlacementFile();
 
             foreach (string rawPlacementLine in rawPlacementData.Skip(1))
             {
-                string[] splitPlacementLine = rawPlacementLine.Split(";");
+                string[] splitPlacementLine = rawPlacementLine.Split(septChar);
 
                 PointF placementPos = new PointF
                 {
@@ -129,7 +146,7 @@ namespace KiCadPanelAssyFG
 
                 PlacementSide placementSide = (splitPlacementLine[SideIndex].Contains("top", StringComparison.OrdinalIgnoreCase) ? (PlacementSide.Top) : (splitPlacementLine[SideIndex].Contains("bottom", StringComparison.OrdinalIgnoreCase) ? (PlacementSide.Bottom) : (PlacementSide.Undef)));
 
-                outputPlacements.PlacementData.Add(splitPlacementLine[ReferencesIndex], new PlacementDataLine(splitPlacementLine[ReferencesIndex], splitPlacementLine[ValueIndex], splitPlacementLine[FootprintIndex], placementPos, placementRot, placementSide));
+                outputPlacements.PlacementData.Add(new PlacementDataLine(splitPlacementLine[ReferencesIndex], splitPlacementLine[ValueIndex], splitPlacementLine[FootprintIndex], placementPos, placementRot, placementSide));
             }
 
             return outputPlacements;

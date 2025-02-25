@@ -43,6 +43,14 @@ namespace KiCadPanelAssyFG
                 Util.DwmSetWindowAttribute(Handle, 20, new[] { 1 }, 4);
         }
     }
+    public partial class DoubleProgressbarWindow : Form
+    {
+        protected override void OnHandleCreated(EventArgs e)
+        {
+            if (Util.DwmSetWindowAttribute(Handle, 19, new[] { 1 }, 4) != 0)
+                Util.DwmSetWindowAttribute(Handle, 20, new[] { 1 }, 4);
+        }
+    }
 
     public class Util
     {

@@ -4,6 +4,9 @@
     <Compile Update="AddFileForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="DoubleProgressbarWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="FileOverviewForm.cs">
       <SubType>Form</SubType>
     </Compile>

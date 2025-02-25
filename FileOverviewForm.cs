@@ -211,16 +211,35 @@ namespace KiCadPanelAssyFG
 
         private void bExport_Click(object sender, EventArgs e)
         {
-            // Read all BOM files
+            DoubleProgressbarWindow progressbarWindow = new DoubleProgressbarWindow("Loading Designs", "Loading Design: ", "Parsing: ");
+            progressbarWindow.Show();
+
+            progressbarWindow.PrimaryMaxProgress = Designs.Count;
+
+
+            // Read and parse all BOM and placement files
             foreach (string designKey in Designs.Keys)
             {
+                progressbarWindow.SecondaryMaxProgress = 1 + Designs[designKey].Placements.Count;
+
+                progressbarWindow.PrimaryText = "Loading Design: " + designKey;
+                progressbarWindow.SecondaryText = "Parsing BOM File: " + designKey;
+
                 Designs[designKey].parseBomFromFile();
+                progressbarWindow.SecondaryProgress += 1;
 
                 foreach (string placementKey in Designs[designKey].Placements.Keys)
                 {
+                    progressbarWindow.SecondaryText = "Parsing Placement File: " + placementKey;
                     Designs[designKey].Placements[placementKey].parsePlacementFromFile();
+                    progressbarWindow.SecondaryProgress += 1;
                 }
+
+                progressbarWindow.PrimaryProgress += 1;
+                progressbarWindow.SecondaryProgress = 0;
             }
+
+            progressbarWindow.Close();
         }
     }
 }

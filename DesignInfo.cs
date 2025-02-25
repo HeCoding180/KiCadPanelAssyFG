@@ -25,7 +25,8 @@ namespace KiCadPanelAssyFG
 
         public void parsePlacementFromFile()
         {
-            this.PlacementFileData = PlacementFile.Parse(PlacementFileDir);
+            PlacementFileData = PlacementFile.Parse(PlacementFileDir);
+            return;
         }
     }
 
@@ -70,7 +71,7 @@ namespace KiCadPanelAssyFG
 
         public void parseBomFromFile()
         {
-            this.BOMFileData = BOMFile.Parse(BOMFileDir);
+            BOMFileData = BOMFile.Parse(BOMFileDir);
         }
     }
 }
