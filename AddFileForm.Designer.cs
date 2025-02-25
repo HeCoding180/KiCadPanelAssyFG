@@ -72,7 +72,7 @@
             nameTextbox.Location = new Point(4, 3);
             nameTextbox.Name = "nameTextbox";
             nameTextbox.Size = new Size(400, 18);
-            nameTextbox.TabIndex = 2;
+            nameTextbox.TabIndex = 1;
             // 
             // fileTextbox
             // 
@@ -84,7 +84,7 @@
             fileTextbox.Location = new Point(4, 3);
             fileTextbox.Name = "fileTextbox";
             fileTextbox.Size = new Size(294, 18);
-            fileTextbox.TabIndex = 3;
+            fileTextbox.TabIndex = 2;
             // 
             // bOk
             // 
@@ -94,7 +94,7 @@
             bOk.Location = new Point(12, 124);
             bOk.Name = "bOk";
             bOk.Size = new Size(100, 25);
-            bOk.TabIndex = 4;
+            bOk.TabIndex = 6;
             bOk.Text = "OK";
             bOk.UseVisualStyleBackColor = false;
             bOk.Click += bOk_Click;
@@ -107,7 +107,7 @@
             bCancel.Location = new Point(118, 124);
             bCancel.Name = "bCancel";
             bCancel.Size = new Size(100, 25);
-            bCancel.TabIndex = 5;
+            bCancel.TabIndex = 7;
             bCancel.Text = "Cancel";
             bCancel.UseVisualStyleBackColor = false;
             bCancel.Click += bCancel_Click;
@@ -121,7 +121,7 @@
             bBrowse.Location = new Point(322, 86);
             bBrowse.Name = "bBrowse";
             bBrowse.Size = new Size(100, 25);
-            bBrowse.TabIndex = 6;
+            bBrowse.TabIndex = 3;
             bBrowse.Text = "Browse";
             bBrowse.UseVisualStyleBackColor = false;
             bBrowse.Click += bBrowse_Click;
@@ -163,7 +163,7 @@
             topRadioButton.Location = new Point(307, 127);
             topRadioButton.Name = "topRadioButton";
             topRadioButton.Size = new Size(44, 19);
-            topRadioButton.TabIndex = 10;
+            topRadioButton.TabIndex = 4;
             topRadioButton.TabStop = true;
             topRadioButton.Text = "Top";
             topRadioButton.UseVisualStyleBackColor = true;
@@ -174,7 +174,7 @@
             bottomRadioButton.Location = new Point(357, 127);
             bottomRadioButton.Name = "bottomRadioButton";
             bottomRadioButton.Size = new Size(65, 19);
-            bottomRadioButton.TabIndex = 11;
+            bottomRadioButton.TabIndex = 5;
             bottomRadioButton.TabStop = true;
             bottomRadioButton.Text = "Bottom";
             bottomRadioButton.UseVisualStyleBackColor = true;
@@ -201,6 +201,7 @@
             Name = "AddFileForm";
             ShowIcon = false;
             Text = "AddFileForm";
+            Shown += AddFileForm_Shown;
             nameTextboxPanel.ResumeLayout(false);
             nameTextboxPanel.PerformLayout();
             fileTextboxPanel.ResumeLayout(false);

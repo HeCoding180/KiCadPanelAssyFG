@@ -121,5 +121,11 @@ namespace KiCadPanelAssyFG
         {
             this.Close();
         }
+
+        private void AddFileForm_Shown(object sender, EventArgs e)
+        {
+            // Focus name textbox when the form is shown for improved user experience
+            nameTextbox.Focus();
+        }
     }
 }
