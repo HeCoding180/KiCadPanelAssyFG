@@ -15,12 +15,21 @@ namespace KiCadPanelAssyFG
         // Private readonly variables
         private static readonly Rectangle IconButtonImageBounds = new Rectangle(7, 7, 16, 16);
 
+        // Private variables
+        private ExportForm ExportWin;
+        private bool ExportWinActive;
+
         public FileOverviewForm()
         {
             InitializeComponent();
 
             designListBox.BackColor = WindowColors.NormalBGColor;
             placementsListBox.BackColor = WindowColors.NormalBGColor;
+        }
+
+        public void ExportForm_Closing(object sender, FormClosingEventArgs e)
+        {
+            ExportWinActive = false;
         }
 
         private void ListBox_MeasureItem(object sender, MeasureItemEventArgs e)
@@ -216,30 +225,64 @@ namespace KiCadPanelAssyFG
 
             progressbarWindow.PrimaryMaxProgress = Designs.Count;
 
+            string lastDesignKey = "";
+            string lastPlacementKey = "";
 
-            // Read and parse all BOM and placement files
-            foreach (string designKey in Designs.Keys)
+            try
             {
-                progressbarWindow.SecondaryMaxProgress = 1 + Designs[designKey].Placements.Count;
-
-                progressbarWindow.PrimaryText = "Loading Design: " + designKey;
-                progressbarWindow.SecondaryText = "Parsing BOM File: " + designKey;
-
-                Designs[designKey].parseBomFromFile();
-                progressbarWindow.SecondaryProgress += 1;
-
-                foreach (string placementKey in Designs[designKey].Placements.Keys)
+                // Read and parse all BOM and placement files
+                foreach (string designKey in Designs.Keys)
                 {
-                    progressbarWindow.SecondaryText = "Parsing Placement File: " + placementKey;
-                    Designs[designKey].Placements[placementKey].parsePlacementFromFile();
-                    progressbarWindow.SecondaryProgress += 1;
-                }
+                    lastDesignKey = designKey;
+                    progressbarWindow.SecondaryMaxProgress = 1 + Designs[designKey].Placements.Count;
 
-                progressbarWindow.PrimaryProgress += 1;
-                progressbarWindow.SecondaryProgress = 0;
+                    progressbarWindow.PrimaryText = "Loading Design: " + designKey;
+                    progressbarWindow.SecondaryText = "Parsing BOM File: " + designKey;
+
+                    Designs[designKey].parseBomFromFile();
+                    progressbarWindow.SecondaryProgress += 1;
+
+                    foreach (string placementKey in Designs[designKey].Placements.Keys)
+                    {
+                        lastPlacementKey = placementKey;
+
+                        progressbarWindow.SecondaryText = "Parsing Placement File: " + placementKey;
+                        Designs[designKey].Placements[placementKey].parsePlacementFromFile();
+                        progressbarWindow.SecondaryProgress += 1;
+                    }
+                    lastPlacementKey = "";
+
+                    progressbarWindow.PrimaryProgress += 1;
+                    progressbarWindow.SecondaryProgress = 0;
+                }
+            }
+            catch (ArgumentDataException argEx)
+            {
+                string errorMessage;
+                if (lastPlacementKey != "")
+                    errorMessage = "The import failed in Design \"" + lastDesignKey + "\" in  \"" + lastPlacementKey + "\" with the following error message: " + Environment.NewLine + argEx.Message;
+                else
+                    errorMessage = "The import failed in Design \"" + lastDesignKey + "\" with the following error message: " + Environment.NewLine + argEx.Message;
+                MessageBox.Show(errorMessage, "Import Aborted", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             progressbarWindow.Close();
+
+            if ((ExportWin == null) || !ExportWinActive)
+            {
+                ExportWin = new ExportForm(this);
+
+                foreach (string designKey in Designs.Keys)
+                {
+                    ExportWin.AddDesign(Designs[designKey]);
+                }
+
+                ExportWin.Show();
+
+                ExportWin.UpdateTables();
+
+                ExportWinActive = true;
+            }
         }
     }
 }

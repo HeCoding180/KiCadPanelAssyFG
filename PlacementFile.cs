@@ -9,13 +9,23 @@ using System.Xml.Linq;
 
 namespace KiCadPanelAssyFG
 {
-    internal class PlacementFile
+    public class PlacementFile
     {
         public List<PlacementDataLine> PlacementData { set; get; }
 
         public PlacementFile()
         {
             PlacementData = new List<PlacementDataLine>(0);
+        }
+
+        public PlacementFile(PlacementFile placementFile)
+        {
+            PlacementData = new List<PlacementDataLine>(0);
+
+            foreach (PlacementDataLine dataLine in placementFile.PlacementData)
+            {
+                PlacementData.Add(new PlacementDataLine(dataLine));
+            }
         }
 
         public static PlacementFile Parse(string fileDir)
@@ -153,43 +163,53 @@ namespace KiCadPanelAssyFG
         }
     }
 
-    internal class PlacementDataLine
+    public class PlacementDataLine
     {
-        string Reference { set; get; }
-        string Value { set; get; }
-        string Package { set; get; }
-        PointF Position { set; get; }
-        float Rotation { set; get; }
+        public string Reference { set; get; }
+        public string Value { set; get; }
+        public string Footprint { set; get; }
+        public PointF Position { set; get; }
+        public float Rotation { set; get; }
         public PlacementSide Side { set; get; }
 
         public PlacementDataLine()
         {
             Reference = "";
             Value = "";
-            Package = "";
+            Footprint = "";
             Position = new PointF(0, 0);
             Rotation = 0;
             Side = PlacementSide.Undef;
         }
 
-        public PlacementDataLine(string reference, string value, string package, PointF pos, float rot, PlacementSide side)
+        public PlacementDataLine(string reference, string value, string footprint, PointF pos, float rot, PlacementSide side)
         {
             Reference = reference;
             Value = value;
-            Package = package;
+            Footprint = footprint;
             Position = pos;
             Rotation = rot;
             Side = side;
         }
 
-        public PlacementDataLine(string reference, string value, string package, float posX, float posY, float rot, PlacementSide side)
+        public PlacementDataLine(string reference, string value, string footprint, float posX, float posY, float rot, PlacementSide side)
         {
             Reference = reference;
             Value = value;
-            Package = package;
+            Footprint = footprint;
             Position = new PointF(posX, posY);
             Rotation = rot;
             Side = side;
+        }
+
+        public PlacementDataLine(PlacementDataLine dataLine)
+        {
+            Reference = dataLine.Reference;
+            Value = dataLine.Value;
+            Footprint = dataLine.Footprint;
+            Position = new PointF(dataLine.Position.X, dataLine.Position.Y);
+            Rotation = dataLine.Rotation;
+            Side = dataLine.Side;
         }
     }
 }

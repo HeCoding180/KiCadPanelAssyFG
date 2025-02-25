@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace KiCadPanelAssyFG
 {
-    internal class PlacementInfo
+    public class PlacementInfo
     {
         public string Name;
         public string PlacementFileDir;
@@ -28,11 +28,11 @@ namespace KiCadPanelAssyFG
         }
     }
 
-    internal class DesignInfo
+    public class DesignInfo
     {
         public string Name;
         public string BOMFileDir;
-        public Dictionary<string, PlacementInfo> Placements = new Dictionary<string, PlacementInfo>();
+        public Dictionary<string, PlacementInfo> Placements;
 
         public BOMFile BOMFileData;
 
@@ -40,6 +40,8 @@ namespace KiCadPanelAssyFG
         {
             Name = name;
             BOMFileDir = bomFileDir;
+
+            Placements = new Dictionary<string, PlacementInfo>();
 
             BOMFileData = new BOMFile();
         }
@@ -49,6 +51,7 @@ namespace KiCadPanelAssyFG
             Name = name;
             BOMFileDir = bomFileDir;
 
+            Placements = new Dictionary<string, PlacementInfo>();
             foreach (PlacementInfo placementInfo in placementInfos)
             {
                 Placements.Add(placementInfo.Name, placementInfo);

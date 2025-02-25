@@ -39,7 +39,7 @@
             bAddPlacements = new Button();
             placementsListBox = new ListBox();
             lPlacementPos = new Label();
-            bExport = new Button();
+            bImport = new Button();
             panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)mainSplitcontainer).BeginInit();
             mainSplitcontainer.Panel1.SuspendLayout();
@@ -196,20 +196,20 @@
             lPlacementPos.TabIndex = 1;
             lPlacementPos.Text = "Placement Position Files:";
             // 
-            // bExport
+            // bImport
             // 
-            bExport.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            bExport.BackColor = Color.FromArgb(31, 31, 31);
-            bExport.FlatAppearance.BorderColor = Color.FromArgb(66, 66, 66);
-            bExport.FlatStyle = FlatStyle.Flat;
-            bExport.ForeColor = SystemColors.Control;
-            bExport.Location = new Point(7, 419);
-            bExport.Name = "bExport";
-            bExport.Size = new Size(770, 35);
-            bExport.TabIndex = 7;
-            bExport.Text = "Export BOM and Placement File";
-            bExport.UseVisualStyleBackColor = false;
-            bExport.Click += bExport_Click;
+            bImport.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            bImport.BackColor = Color.FromArgb(31, 31, 31);
+            bImport.FlatAppearance.BorderColor = Color.FromArgb(66, 66, 66);
+            bImport.FlatStyle = FlatStyle.Flat;
+            bImport.ForeColor = SystemColors.Control;
+            bImport.Location = new Point(7, 419);
+            bImport.Name = "bImport";
+            bImport.Size = new Size(770, 35);
+            bImport.TabIndex = 7;
+            bImport.Text = "Import BOM and Placement Files";
+            bImport.UseVisualStyleBackColor = false;
+            bImport.Click += bExport_Click;
             // 
             // FileOverviewForm
             // 
@@ -217,7 +217,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(26, 26, 26);
             ClientSize = new Size(784, 461);
-            Controls.Add(bExport);
+            Controls.Add(bImport);
             Controls.Add(panel1);
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(500, 300);
@@ -236,7 +236,7 @@
         #endregion
 
         private Panel panel1;
-        private Button bExport;
+        private Button bImport;
         private SplitContainer mainSplitcontainer;
         private Label lDesigns;
         private Label lPlacementPos;

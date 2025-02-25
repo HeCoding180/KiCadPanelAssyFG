@@ -7,13 +7,38 @@ using System.Threading.Tasks;
 
 namespace KiCadPanelAssyFG
 {
-    internal class BOMFile
+    public class BOMFile
     {
         public Dictionary<string, BOMDataLine> BOMData { set; get; }
 
         public BOMFile()
         {
             BOMData = new Dictionary<string, BOMDataLine>();
+        }
+
+        public BOMFile(BOMFile bomFile)
+        {
+            BOMData = new Dictionary<string, BOMDataLine>();
+
+            foreach (string bomKey in bomFile.BOMData.Keys)
+            {
+                BOMData.Add(bomKey, new BOMDataLine(bomFile.BOMData[bomKey]));
+            }
+        }
+
+        public void MergeFile(BOMFile BOM)
+        {
+            foreach (string bomDataKey in BOM.BOMData.Keys)
+            {
+                if (BOMData.ContainsKey(bomDataKey))
+                {
+                    BOMData[bomDataKey].Designators.AddRange(BOM.BOMData[bomDataKey].Designators);
+                }
+                else
+                {
+                    BOMData.Add(BOM.BOMData[bomDataKey].LCSC_PN, new BOMDataLine(BOM.BOMData[bomDataKey]));
+                }
+            }
         }
 
         public static BOMFile Parse(string fileDir)
@@ -104,32 +129,50 @@ namespace KiCadPanelAssyFG
         }
     }
 
-    internal class BOMDataLine
+    public class BOMDataLine
     {
-        string Value { set; get; }
-        string[] Designators { set; get; }
-        string Footprint { set; get; }
-        string LCSC_PN { set; get; }
+        public string Value { set; get; }
+        public List<string> Designators { set; get; }
+        public string Footprint { set; get; }
+        public string LCSC_PN { set; get; }
 
-        public BOMDataLine(string[] designators, string lCSC_PN)
+        public BOMDataLine(string[] designators, string lcscPN)
         {
-            LCSC_PN = lCSC_PN;
-
-            Designators = new string[designators.Length];
-            Array.Copy(designators, Designators, designators.Length);
-
             Value = "";
             Footprint = "";
+            LCSC_PN = lcscPN;
+
+            Designators = new List<string>();
+            Designators.AddRange(designators);
         }
 
-        public BOMDataLine(string value, string[] designators, string footprint, string lCSC_PN)
+        public BOMDataLine(string value, string footprint, string lcscPN)
         {
             Value = value;
             Footprint = footprint;
-            LCSC_PN = lCSC_PN;
+            LCSC_PN = lcscPN;
 
-            Designators = new string[designators.Length];
-            Array.Copy(designators, Designators, designators.Length);
+            Designators = new List<string>();
+        }
+
+        public BOMDataLine(string value, string[] designators, string footprint, string lcscPN)
+        {
+            Value = value;
+            Footprint = footprint;
+            LCSC_PN = lcscPN;
+
+            Designators = new List<string>();
+            Designators.AddRange(designators);
+        }
+
+        public BOMDataLine(BOMDataLine bomDataLine)
+        {
+            Value = bomDataLine.Value;
+            Footprint = bomDataLine.Footprint;
+            LCSC_PN = bomDataLine.LCSC_PN;
+
+            Designators = new List<string>();
+            Designators.AddRange(bomDataLine.Designators);
         }
     }
 }

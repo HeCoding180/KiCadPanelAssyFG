@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="KiCadPanelAssyFG.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="FootprintDirs" Type="System.String" Scope="User">
+      <Value Profile="(Default)">asdf</Value>
+    </Setting>
+    <Setting Name="UseSeparatePlacementFiles" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="TopOutlineColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">252, 36, 228</Value>
+    </Setting>
+    <Setting Name="BottomOutlineColor" Type="System.Drawing.Color" Scope="User">
+      <Value Profile="(Default)">38, 233, 255</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
