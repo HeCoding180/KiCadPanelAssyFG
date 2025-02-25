@@ -1,16 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Compile Update="AddFileForm.cs">
+    <Compile Update="src\Forms\AddFileForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="DoubleProgressbarWindow.cs">
+    <Compile Update="src\Forms\DoubleProgressbarWindow.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="ExportForm.cs">
+    <Compile Update="src\Forms\ExportForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Update="FileOverviewForm.cs">
+    <Compile Update="src\Forms\FileOverviewForm.cs">
       <SubType>Form</SubType>
     </Compile>
   </ItemGroup>
