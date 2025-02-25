@@ -134,7 +134,7 @@ namespace KiCadPanelAssyFG
 
             foreach (string rawPlacementLine in rawPlacementData.Skip(1))
             {
-                string[] splitPlacementLine = rawPlacementLine.Split(septChar);
+                string[] splitPlacementLine = rawPlacementLine.Replace("\"", "").Split(septChar);
 
                 PointF placementPos = new PointF
                 {
