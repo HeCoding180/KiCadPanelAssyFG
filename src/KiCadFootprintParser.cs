@@ -36,55 +36,61 @@ namespace KiCadPanelAssyFG
 
         public bool TryBuildClosedPolygonalLine()
         {
-            outlineIsClosedPolygonalChain = false;
-
-            OutlinePolyPoints.Clear();
-            List<LineF> refSegmentsList = new List<LineF>(OutlineSegments);
-
-            // Dictionary of all outline segments where the key is the line's start point and the value is the according endpoint.
-            Dictionary<PointF, PointF> SegmentsMap = new Dictionary<PointF, PointF>();
-            SegmentsMap.Add(OutlineSegments[0].StartPoint, OutlineSegments[0].EndPoint);
-
-            // Remove first line from the reference list, since it was already added to the map.
-            refSegmentsList.RemoveAt(0);
-
-            for (int i = 0; i < OutlineSegments.Count - 1; i++)
+            if (OutlineSegments.Count > 0)
             {
-                bool matchFound = false;
-                for (int j = 0; j < refSegmentsList.Count; j++)
+                outlineIsClosedPolygonalChain = false;
+
+                OutlinePolyPoints.Clear();
+                List<LineF> refSegmentsList = new List<LineF>(OutlineSegments);
+
+                // Dictionary of all outline segments where the key is the line's start point and the value is the according endpoint.
+                Dictionary<PointF, PointF> SegmentsMap = new Dictionary<PointF, PointF>();
+                SegmentsMap.Add(OutlineSegments[0].StartPoint, OutlineSegments[0].EndPoint);
+
+                // Remove first line from the reference list, since it was already added to the map.
+                refSegmentsList.RemoveAt(0);
+
+                for (int i = 0; i < OutlineSegments.Count - 1; i++)
                 {
-                    if (refSegmentsList[i].StartPoint == SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value)
+                    bool matchFound = false;
+                    for (int j = 0; j < refSegmentsList.Count; j++)
                     {
-                        // Check for triple point
-                        if (SegmentsMap.ContainsKey(refSegmentsList[i].StartPoint)) return false;
+                        if (refSegmentsList[i].StartPoint == SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value)
+                        {
+                            // Check for triple point
+                            if (SegmentsMap.ContainsKey(refSegmentsList[i].StartPoint)) return false;
 
-                        SegmentsMap.Add(refSegmentsList[i].StartPoint, refSegmentsList[i].EndPoint);
-                        refSegmentsList.RemoveAt(j);
-                        matchFound = true;
-                        break;
-                    }
-                    else if (refSegmentsList[i].EndPoint == SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value)
-                    {
-                        // Check for triple point
-                        if (SegmentsMap.ContainsKey(refSegmentsList[i].EndPoint)) return false;
+                            SegmentsMap.Add(refSegmentsList[i].StartPoint, refSegmentsList[i].EndPoint);
+                            refSegmentsList.RemoveAt(j);
+                            matchFound = true;
+                            break;
+                        }
+                        else if (refSegmentsList[i].EndPoint == SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value)
+                        {
+                            // Check for triple point
+                            if (SegmentsMap.ContainsKey(refSegmentsList[i].EndPoint)) return false;
 
-                        SegmentsMap.Add(refSegmentsList[i].EndPoint, refSegmentsList[i].StartPoint);
-                        refSegmentsList.RemoveAt(j);
-                        matchFound = true;
-                        break;
+                            SegmentsMap.Add(refSegmentsList[i].EndPoint, refSegmentsList[i].StartPoint);
+                            refSegmentsList.RemoveAt(j);
+                            matchFound = true;
+                            break;
+                        }
                     }
+
+                    if (!matchFound) return false;
                 }
 
-                if (!matchFound) return false;
+                // Check if loop is closed
+                if (SegmentsMap.First().Key != SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value) return false;
+
+                OutlinePolyPoints.AddRange(SegmentsMap.Keys);
+                outlineIsClosedPolygonalChain = true;
+
+                return true;
             }
 
-            // Check if loop is closed
-            if (SegmentsMap.First().Key != SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value) return false;
-
-            OutlinePolyPoints.AddRange(SegmentsMap.Keys);
-            outlineIsClosedPolygonalChain = true;
-
-            return true;
+            // Outline is empty
+            return false;
         }
     }
 
@@ -102,7 +108,7 @@ namespace KiCadPanelAssyFG
 
             for (int i = 0; i < dataLines.Count; i++)
             {
-                if (dataLines[i].Trim().StartsWith("(fp_line") && dataLines.Skip(i).Take(5).Any(l => l.Contains("(layer \"F.CrtYd\")")))
+                if (dataLines[i].Trim().Replace("\t", "").StartsWith("(fp_line") && dataLines.Skip(i).Take(5).Any(l => l.Contains("(layer \"F.CrtYd\")")))
                 {
                     PointF startPoint = new PointF();
                     PointF endPoint = new PointF();
@@ -143,10 +149,7 @@ namespace KiCadPanelAssyFG
                 }
             }
 
-            KiCadFootprintData footprintData = new KiCadFootprintData();
-            footprintData.TryBuildClosedPolygonalLine();
-
-            return footprintData;
+            return new KiCadFootprintData(outlineSegments);
         }
     }
 

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AddFileForm));
             lName = new Label();
             lFile = new Label();
             nameTextbox = new TextBox();
@@ -159,10 +160,12 @@
             Controls.Add(lFile);
             Controls.Add(lName);
             ForeColor = SystemColors.Control;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             MaximumSize = new Size(2000, 200);
             MinimumSize = new Size(450, 200);
             Name = "AddFileForm";
             ShowIcon = false;
+            ShowInTaskbar = false;
             Text = "AddFileForm";
             Shown += AddFileForm_Shown;
             nameTextboxPanel.ResumeLayout(false);

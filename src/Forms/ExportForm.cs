@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -21,6 +22,8 @@ namespace KiCadPanelAssyFG
                 return fpDirsTextbox.Text.Split(Environment.NewLine);
             }
         }
+
+        public bool FootprintsLoaded { private set; get; }
 
         private BOMFile PanelBOM;
         private Dictionary<string, PlacementDataLine> PanelPlacements;
@@ -59,6 +62,21 @@ namespace KiCadPanelAssyFG
             }
         }
 
+        private Color TopOutlineFillColor
+        {
+            get
+            {
+                return Color.FromArgb(128, TopOutlineColor);
+            }
+        }
+        private Color BottomOutlineFillColor
+        {
+            get
+            {
+                return Color.FromArgb(128, BottomOutlineColor);
+            }
+        }
+
         public ExportForm(FileOverviewForm sender)
         {
             InitializeComponent();
@@ -71,6 +89,8 @@ namespace KiCadPanelAssyFG
             uniqueDesigns = 0;
 
             PreviewSize = new Size(0, 0);
+
+            FootprintsLoaded = false;
 
             // Load Settings
             Properties.Settings.Default.Reload();
@@ -263,7 +283,7 @@ namespace KiCadPanelAssyFG
 
                 foreach (string footprintDirectory in KiCadFootprintDirs)
                 {
-                    fullFootprintDir = (footprintDirectory.Trim().Replace("/", "\\") + KiCadFootprintUtil.GetRelativePathFromFootprintName(bomDataLine.Footprint)).Replace("\\\\", "\\");
+                    fullFootprintDir = (footprintDirectory.Trim().Replace("/", "\\") + "\\" + KiCadFootprintUtil.GetRelativePathFromFootprintName(bomDataLine.Footprint)).Replace("\\\\", "\\");
 
                     if (File.Exists(fullFootprintDir))
                     {
@@ -303,24 +323,113 @@ namespace KiCadPanelAssyFG
             float maxY = float.MinValue;
 
             // Apply rotation and position transformations
-            for (int i = 0; i < PanelPlacements.Count; i++)
+            foreach (string placementKey in PanelPlacements.Keys)
             {
-                
+                PlacementDataLine refDataLine = PanelPlacements[placementKey];
+                KiCadFootprintData refFootprintData = refDataLine.FootprintData;
+
+                // Apply footprint rotation and position transformation to outline segments
+                refFootprintData.OutlineSegments = Util.RotPosTransformLines(refFootprintData.OutlineSegments, refDataLine.Position, refDataLine.Rotation);
+
+                // Try build closed polygonal line, get bounds
+                if (refFootprintData.TryBuildClosedPolygonalLine())
+                {
+                    // Outline is a closed polygonal chain
+                    foreach (PointF refPoint in refFootprintData.OutlinePolyPoints)
+                    {
+                        // (Re)calculate min point
+                        minX = float.Min(refPoint.X, minX);
+                        minY = float.Min(refPoint.Y, minY);
+
+                        // (Re)calculate max point
+                        maxX = float.Max(refPoint.X, maxX);
+                        maxY = float.Max(refPoint.Y, maxY);
+                    }
+                }
+                else
+                {
+                    // Outline is not a closed polygonal chain or contains stub or isolated segments
+                    foreach (LineF refLine in refFootprintData.OutlineSegments)
+                    {
+                        // (Re)calculate min point
+                        minX = float.Min(refLine.StartPoint.X, float.Min(refLine.EndPoint.X, minX));
+                        minY = float.Min(refLine.StartPoint.Y, float.Min(refLine.EndPoint.Y, minY));
+
+                        // (Re)calculate max point
+                        maxX = float.Max(refLine.StartPoint.X, float.Max(refLine.EndPoint.X, maxX));
+                        maxY = float.Max(refLine.StartPoint.Y, float.Max(refLine.EndPoint.Y, maxY));
+                    }
+                }
             }
 
             // Calculate unscaled size of the preview
             PreviewSize = new SizeF(maxX - minX, maxY - minY);
+            PointF zeroTransformVector = new PointF(-minX, -minY);
 
-            // Move All outlines to minimum (0, 0)
-            for (int i = 0; i < PanelPlacements.Count; i++)
+            // Apply position transform 
+            foreach (string placementKey in PanelPlacements.Keys)
             {
+                PlacementDataLine refDataLine = PanelPlacements[placementKey];
+                KiCadFootprintData refFootprintData = refDataLine.FootprintData;
 
+                if (refFootprintData.outlineIsClosedPolygonalChain)
+                {
+                    // Outline is a closed polygonal chain
+                    refFootprintData.OutlineSegments = Util.PosTransformLines(refFootprintData.OutlineSegments, zeroTransformVector);
+                    refFootprintData.OutlinePolyPoints = Util.PosTransformPoints(refFootprintData.OutlinePolyPoints, zeroTransformVector);
+                }
+                else
+                {
+                    // Outline is not a closed polygonal chain or contains stub or isolated segments
+                    refFootprintData.OutlineSegments = Util.PosTransformLines(refFootprintData.OutlineSegments, zeroTransformVector);
+                }
             }
+
+            FootprintsLoaded = true;
         }
 
         private void PlacementPreviewPanel_Paint(object sender, PaintEventArgs e)
         {
+            // Fill Background
+            e.Graphics.Clear(Color.Black);
 
+            if (FootprintsLoaded)
+            {
+                using (Pen TopOutlinePen = new Pen(TopOutlineColor),
+                    BottomOutlinePen = new Pen(BottomOutlineColor))
+                using (Brush TopFillBrush = new SolidBrush(TopOutlineFillColor),
+                    BottomFillBrush = new SolidBrush(BottomOutlineFillColor))
+                {
+                    foreach (string placementKey in PanelPlacements.Keys)
+                    {
+                        PlacementDataLine refDataLine = PanelPlacements[placementKey];
+                        KiCadFootprintData refFootprintData = refDataLine.FootprintData;
+
+                        // Check if placement side is valid and visible
+                        if (((refDataLine.Side == PlacementSide.Top) && topVisibleCheckbox.Checked) || ((refDataLine.Side == PlacementSide.Bottom) && bottomVisibleCheckbox.Checked))
+                        {
+                            // Select appropriate brushes
+                            Pen OutlinePen = (refDataLine.Side == PlacementSide.Top) ? TopOutlinePen : BottomOutlinePen;
+                            Brush FillBrush = (refDataLine.Side == PlacementSide.Top) ? TopFillBrush : BottomFillBrush;
+
+                            if (refFootprintData.outlineIsClosedPolygonalChain)
+                            {
+                                // Outline is a closed polygonal chain
+                                e.Graphics.FillPolygon(FillBrush, refFootprintData.OutlinePolyPoints.ToArray());
+                                e.Graphics.DrawPolygon(OutlinePen, refFootprintData.OutlinePolyPoints.ToArray());
+                            }
+                            else
+                            {
+                                // Outline is not a closed polygonal chain or contains stub or isolated segments
+                                foreach (LineF refLine in refFootprintData.OutlineSegments)
+                                {
+                                    e.Graphics.DrawLine(OutlinePen, refLine.StartPoint, refLine.EndPoint);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
