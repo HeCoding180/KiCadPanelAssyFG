@@ -32,7 +32,7 @@ namespace KiCadPanelAssyFG
             {
                 if (BOMData.ContainsKey(bomDataKey))
                 {
-                    BOMData[bomDataKey].Designators.AddRange(BOM.BOMData[bomDataKey].Designators);
+                    BOMData[bomDataKey].References.AddRange(BOM.BOMData[bomDataKey].References);
                 }
                 else
                 {
@@ -132,18 +132,18 @@ namespace KiCadPanelAssyFG
     public class BOMDataLine
     {
         public string Value { set; get; }
-        public List<string> Designators { set; get; }
+        public List<string> References { set; get; }
         public string Footprint { set; get; }
         public string LCSC_PN { set; get; }
 
-        public BOMDataLine(string[] designators, string lcscPN)
+        public BOMDataLine(string[] references, string lcscPN)
         {
             Value = "";
             Footprint = "";
             LCSC_PN = lcscPN;
 
-            Designators = new List<string>();
-            Designators.AddRange(designators);
+            References = new List<string>();
+            References.AddRange(references);
         }
 
         public BOMDataLine(string value, string footprint, string lcscPN)
@@ -152,16 +152,16 @@ namespace KiCadPanelAssyFG
             Footprint = footprint;
             LCSC_PN = lcscPN;
 
-            Designators = new List<string>();
+            References = new List<string>();
         }
 
-        public BOMDataLine(string value, string[] designators, string footprint, string lcscPN)
+        public BOMDataLine(string value, string[] references, string footprint, string lcscPN)
         {
             Value = value;
             Footprint = footprint;
             LCSC_PN = lcscPN;
 
-            Designators = new List<string>(designators);
+            References = new List<string>(references);
         }
 
         public BOMDataLine(BOMDataLine bomDataLine)
@@ -170,7 +170,7 @@ namespace KiCadPanelAssyFG
             Footprint = bomDataLine.Footprint;
             LCSC_PN = bomDataLine.LCSC_PN;
 
-            Designators = new List<string>(bomDataLine.Designators);
+            References = new List<string>(bomDataLine.References);
         }
     }
 }

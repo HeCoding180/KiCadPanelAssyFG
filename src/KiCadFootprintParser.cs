@@ -7,7 +7,88 @@ using System.Threading.Tasks;
 
 namespace KiCadPanelAssyFG
 {
-    public class KiCadFootprintParser
+    public class KiCadFootprintData
+    {
+        public List<LineF> OutlineSegments;
+        public List<PointF> OutlinePolyPoints;
+        public bool outlineIsClosedPolygonalChain { private set; get; }
+
+        public KiCadFootprintData()
+        {
+            OutlineSegments = new List<LineF>();
+            OutlinePolyPoints = new List<PointF>();
+            outlineIsClosedPolygonalChain = false;
+        }
+
+        public KiCadFootprintData(List<LineF> outline)
+        {
+            OutlineSegments = outline;
+            OutlinePolyPoints = new List<PointF>();
+            outlineIsClosedPolygonalChain = false;
+        }
+
+        public KiCadFootprintData(KiCadFootprintData refData)
+        {
+            OutlineSegments = new List<LineF>(refData.OutlineSegments);
+            OutlinePolyPoints = new List<PointF>(refData.OutlinePolyPoints);
+            outlineIsClosedPolygonalChain = refData.outlineIsClosedPolygonalChain;
+        }
+
+        public bool TryBuildClosedPolygonalLine()
+        {
+            outlineIsClosedPolygonalChain = false;
+
+            OutlinePolyPoints.Clear();
+            List<LineF> refSegmentsList = new List<LineF>(OutlineSegments);
+
+            // Dictionary of all outline segments where the key is the line's start point and the value is the according endpoint.
+            Dictionary<PointF, PointF> SegmentsMap = new Dictionary<PointF, PointF>();
+            SegmentsMap.Add(OutlineSegments[0].StartPoint, OutlineSegments[0].EndPoint);
+
+            // Remove first line from the reference list, since it was already added to the map.
+            refSegmentsList.RemoveAt(0);
+
+            for (int i = 0; i < OutlineSegments.Count - 1; i++)
+            {
+                bool matchFound = false;
+                for (int j = 0; j < refSegmentsList.Count; j++)
+                {
+                    if (refSegmentsList[i].StartPoint == SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value)
+                    {
+                        // Check for triple point
+                        if (SegmentsMap.ContainsKey(refSegmentsList[i].StartPoint)) return false;
+
+                        SegmentsMap.Add(refSegmentsList[i].StartPoint, refSegmentsList[i].EndPoint);
+                        refSegmentsList.RemoveAt(j);
+                        matchFound = true;
+                        break;
+                    }
+                    else if (refSegmentsList[i].EndPoint == SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value)
+                    {
+                        // Check for triple point
+                        if (SegmentsMap.ContainsKey(refSegmentsList[i].EndPoint)) return false;
+
+                        SegmentsMap.Add(refSegmentsList[i].EndPoint, refSegmentsList[i].StartPoint);
+                        refSegmentsList.RemoveAt(j);
+                        matchFound = true;
+                        break;
+                    }
+                }
+
+                if (!matchFound) return false;
+            }
+
+            // Check if loop is closed
+            if (SegmentsMap.First().Key != SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value) return false;
+
+            OutlinePolyPoints.AddRange(SegmentsMap.Keys);
+            outlineIsClosedPolygonalChain = true;
+
+            return true;
+        }
+    }
+
+    public static class KiCadFootprintParser
     {
         public static KiCadFootprintData ParseKiCadFootprint(string fileDir)
         {
@@ -69,77 +150,15 @@ namespace KiCadPanelAssyFG
         }
     }
 
-    public class KiCadFootprintData
+    public static class KiCadFootprintUtil
     {
-        public List<LineF> OutlineSegments;
-        public List<PointF> OutlinePolyPoints;
-        public bool outlineIsClosedPolygonalChain { private set; get; }
-
-        public KiCadFootprintData()
+        public static string GetRelativePathFromFootprintName(string name)
         {
-            OutlineSegments = new List<LineF>();
-            OutlinePolyPoints = new List<PointF>();
-            outlineIsClosedPolygonalChain = false;
-        }
+            string[] splitName = name.Trim().Split(':');
 
-        public KiCadFootprintData(List<LineF> outline)
-        {
-            OutlineSegments = outline;
-            OutlinePolyPoints = new List<PointF>();
-            outlineIsClosedPolygonalChain = false;
-        }
+            if (splitName.Length != 2) throw new ArgumentDataException("Invalid footprint name, ':' (colon) character not found");
 
-        public bool TryBuildClosedPolygonalLine()
-        {
-            outlineIsClosedPolygonalChain = false;
-
-            OutlinePolyPoints.Clear();
-            List<LineF> refSegmentsList = new List<LineF>(OutlineSegments);
-
-            // Dictionary of all outline segments where the key is the line's start point and the value is the according endpoint.
-            Dictionary<PointF, PointF> SegmentsMap = new Dictionary<PointF, PointF>();
-            SegmentsMap.Add(OutlineSegments[0].StartPoint, OutlineSegments[0].EndPoint);
-
-            // Remove first line from the reference list, since it was already added to the map.
-            refSegmentsList.RemoveAt(0);
-
-            for (int i = 0; i < OutlineSegments.Count - 1; i++)
-            {
-                bool matchFound = false;
-                for (int j = 0; j < refSegmentsList.Count; j++)
-                {
-                    if (refSegmentsList[i].StartPoint == SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value)
-                    {
-                        // Check for triple point
-                        if (SegmentsMap.ContainsKey(refSegmentsList[i].StartPoint)) return false;
-
-                        SegmentsMap.Add(refSegmentsList[i].StartPoint, refSegmentsList[i].EndPoint);
-                        refSegmentsList.RemoveAt(j);
-                        matchFound = true;
-                        break;
-                    }
-                    else if (refSegmentsList[i].EndPoint == SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value)
-                    {
-                        // Check for triple point
-                        if (SegmentsMap.ContainsKey(refSegmentsList[i].EndPoint)) return false;
-
-                        SegmentsMap.Add(refSegmentsList[i].EndPoint, refSegmentsList[i].StartPoint);
-                        refSegmentsList.RemoveAt(j);
-                        matchFound = true;
-                        break;
-                    }
-                }
-
-                if (!matchFound) return false;
-            }
-
-            // Check if loop is closed
-            if (SegmentsMap.First().Key != SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value) return false;
-
-            OutlinePolyPoints.AddRange(SegmentsMap.Keys);
-            outlineIsClosedPolygonalChain = true;
-
-            return true;
+            return splitName[0] + ".pretty\\" + splitName[1] + ".kicad_mod";
         }
     }
 }

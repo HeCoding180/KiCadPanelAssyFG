@@ -14,8 +14,18 @@ namespace KiCadPanelAssyFG
     {
         public int uniqueDesigns { private set; get; }
 
+        public string[] KiCadFootprintDirs
+        {
+            get
+            {
+                return fpDirsTextbox.Text.Split(Environment.NewLine);
+            }
+        }
+
         private BOMFile PanelBOM;
         private Dictionary<string, PlacementDataLine> PanelPlacements;
+
+        private SizeF PreviewSize;
 
         private Color _TopOutlineColor;
         private Color _BottomOutlineColor;
@@ -60,8 +70,7 @@ namespace KiCadPanelAssyFG
 
             uniqueDesigns = 0;
 
-            TopOutlineColor = Color.FromArgb(252, 36, 228);
-            BottomOutlineColor = Color.FromArgb(38, 233, 255);
+            PreviewSize = new Size(0, 0);
 
             // Load Settings
             Properties.Settings.Default.Reload();
@@ -98,12 +107,12 @@ namespace KiCadPanelAssyFG
 
                     bool MatchFound_DataLine = false;
 
-                    foreach (string currentDesignator in refBomDataLine.Designators)
+                    foreach (string currentDesignator in refBomDataLine.References)
                     {
                         PlacementDataLine refPlacementDataLine;
                         bool MatchFound_Local = false;
 
-                        outputBomDataLine.Designators.Add(currentDesignator + GetCurrentDesignSuffix());
+                        outputBomDataLine.References.Add(currentDesignator + GetCurrentDesignSuffix());
 
                         for (int i = 0; i < placementDataLines.Count; i++)
                         {
@@ -170,10 +179,10 @@ namespace KiCadPanelAssyFG
             {
                 string designatorsString = "";
 
-                for (int i = 0; i < PanelBOM.BOMData[bomKey].Designators.Count; i++)
+                for (int i = 0; i < PanelBOM.BOMData[bomKey].References.Count; i++)
                 {
                     if (i > 0) designatorsString += ", ";
-                    designatorsString += PanelBOM.BOMData[bomKey].Designators[i];
+                    designatorsString += PanelBOM.BOMData[bomKey].References[i];
                 }
 
                 BOMTable.Rows.Add(
@@ -245,7 +254,68 @@ namespace KiCadPanelAssyFG
 
         private void bReloadFootprints_Click(object sender, EventArgs e)
         {
+            bool AllFootprintsFound = true;
 
+            foreach (BOMDataLine bomDataLine in PanelBOM.BOMData.Values)
+            {
+                string fullFootprintDir = "";
+                bool dirFound = false;
+
+                foreach (string footprintDirectory in KiCadFootprintDirs)
+                {
+                    fullFootprintDir = (footprintDirectory.Trim().Replace("/", "\\") + KiCadFootprintUtil.GetRelativePathFromFootprintName(bomDataLine.Footprint)).Replace("\\\\", "\\");
+
+                    if (File.Exists(fullFootprintDir))
+                    {
+                        dirFound = true;
+                        break;
+                    }
+                }
+
+                if (dirFound)
+                {
+                    KiCadFootprintData partFootprintData = KiCadFootprintParser.ParseKiCadFootprint(fullFootprintDir);
+
+                    foreach (string reference in bomDataLine.References)
+                    {
+                        if (PanelPlacements.ContainsKey(reference))
+                            PanelPlacements[reference].FootprintData = new KiCadFootprintData(partFootprintData);
+                    }
+                }
+                else
+                {
+                    AllFootprintsFound = false;
+                    continue;
+                }
+            }
+
+            if (!AllFootprintsFound)
+            {
+                if (MessageBox.Show("Not all footprints were found press \"OK\" to continue, press \"cancel\" to abort.", "Footprints missing", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) != DialogResult.OK)
+                {
+                    return;
+                }
+            }
+
+            float minX = float.MaxValue;
+            float minY = float.MaxValue;
+            float maxX = float.MinValue;
+            float maxY = float.MinValue;
+
+            // Apply rotation and position transformations
+            for (int i = 0; i < PanelPlacements.Count; i++)
+            {
+                
+            }
+
+            // Calculate unscaled size of the preview
+            PreviewSize = new SizeF(maxX - minX, maxY - minY);
+
+            // Move All outlines to minimum (0, 0)
+            for (int i = 0; i < PanelPlacements.Count; i++)
+            {
+
+            }
         }
 
         private void PlacementPreviewPanel_Paint(object sender, PaintEventArgs e)

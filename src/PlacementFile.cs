@@ -182,6 +182,8 @@ namespace KiCadPanelAssyFG
             Position = new PointF(0, 0);
             Rotation = 0;
             Side = PlacementSide.Undef;
+
+            FootprintData = new KiCadFootprintData();
         }
 
         public PlacementDataLine(string reference, string value, string footprint, PointF pos, float rot, PlacementSide side)
@@ -192,6 +194,8 @@ namespace KiCadPanelAssyFG
             Position = pos;
             Rotation = rot;
             Side = side;
+
+            FootprintData = new KiCadFootprintData();
         }
 
         public PlacementDataLine(string reference, string value, string footprint, float posX, float posY, float rot, PlacementSide side)
@@ -202,6 +206,8 @@ namespace KiCadPanelAssyFG
             Position = new PointF(posX, posY);
             Rotation = rot;
             Side = side;
+
+            FootprintData = new KiCadFootprintData();
         }
 
         public PlacementDataLine(PlacementDataLine dataLine)
@@ -212,6 +218,8 @@ namespace KiCadPanelAssyFG
             Position = new PointF(dataLine.Position.X, dataLine.Position.Y);
             Rotation = dataLine.Rotation;
             Side = dataLine.Side;
+
+            FootprintData = new KiCadFootprintData();
         }
     }
 }

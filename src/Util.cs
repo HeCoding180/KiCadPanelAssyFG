@@ -90,13 +90,114 @@ namespace KiCadPanelAssyFG
         [DllImport("DwmApi")]
         public static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, int[] attrValue, int attrSize);
 
-        public static PointF RotTransformPointF(PointF point, float rot)
+        public static PointF AddPoints(PointF p1, PointF p2) => new PointF(p1.X + p2.X, p1.Y + p2.Y);
+
+        // Rotation transformation single
+        public static PointF RotTransformPoint(PointF point, float alpha)
         {
             return new PointF
             {
-                X = point.X * degCos(rot) - point.Y * degSin(rot),
-                Y = point.Y * degCos(rot) + point.X * degSin(rot)
+                X = point.X * degCos(alpha) - point.Y * degSin(alpha),
+                Y = point.Y * degCos(alpha) + point.X * degSin(alpha)
             };
+        }
+        public static LineF RotTransformLine(LineF line, float alpha)
+        {
+            return new LineF
+            {
+                StartPoint = RotTransformPoint(line.StartPoint, alpha),
+                EndPoint = RotTransformPoint(line.EndPoint, alpha)
+            };
+        }
+
+        // Rotation transformation array
+        public static List<PointF> RotTransformPoints(List<PointF> points, float alpha)
+        {
+            List<PointF> outputPoints = new List<PointF>();
+
+            foreach (PointF p in points)
+            {
+                outputPoints.Add(RotTransformPoint(p, alpha));
+            }
+
+            return outputPoints;
+        }
+        public static List<LineF> RotTransformLines(List<LineF> lines, float alpha)
+        {
+            List<LineF> outputLines = new List<LineF>();
+
+            foreach (LineF line in lines)
+            {
+                outputLines.Add(RotTransformLine(line, alpha));
+            }
+
+            return outputLines;
+        }
+
+        // Position transformation array
+        public static List<PointF> PosTransformPoints(List<PointF> points, PointF transformVec)
+        {
+            List<PointF> outputPoints = new List<PointF>();
+
+            foreach (PointF p in points)
+            {
+                outputPoints.Add(AddPoints(p, transformVec));
+            }
+
+            return outputPoints;
+        }
+        public static List<LineF> PosTransformLines(List<LineF> lines, PointF transformVec)
+        {
+            List<LineF> outputLines = new List<LineF>();
+
+            foreach (LineF line in lines)
+            {
+                outputLines.Add(new LineF(AddPoints(line.StartPoint, transformVec), AddPoints(line.EndPoint, transformVec)));
+            }
+
+            return outputLines;
+        }
+
+        // Position & rotation transformation single
+        public static PointF RotPosTransformPoint(PointF point, PointF transformVec, float alpha)
+        {
+            return new PointF
+            {
+                X = point.X * degCos(alpha) - point.Y * degSin(alpha),
+                Y = point.Y * degCos(alpha) + point.X * degSin(alpha)
+            };
+        }
+        public static LineF RotPosTransformLine(LineF line, PointF transformVec, float alpha)
+        {
+            return new LineF
+            {
+                StartPoint = RotPosTransformPoint(line.StartPoint, transformVec, alpha),
+                EndPoint = RotPosTransformPoint(line.EndPoint, transformVec, alpha)
+            };
+        }
+
+        // Position & rotation transformation array
+        public static List<PointF> RotPosTransformPoints(List<PointF> points, PointF transformVec, float alpha)
+        {
+            List<PointF> outputPoints = new List<PointF>();
+
+            foreach (PointF p in points)
+            {
+                outputPoints.Add(RotPosTransformPoint(p, transformVec, alpha));
+            }
+
+            return outputPoints;
+        }
+        public static List<LineF> RotPosTransformLines(List<LineF> lines, PointF transformVec, float alpha)
+        {
+            List<LineF> outputLines = new List<LineF>();
+
+            foreach (LineF line in lines)
+            {
+                outputLines.Add(RotPosTransformLine(line, transformVec, alpha));
+            }
+
+            return outputLines;
         }
 
         public static float degSin(float x)
