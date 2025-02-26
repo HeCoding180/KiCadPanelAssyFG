@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace KiCadPanelAssyFG
 {
-    internal class KiCadFootprintParser
+    public class KiCadFootprintParser
     {
         public static KiCadFootprintData ParseKiCadFootprint(string fileDir)
         {
@@ -69,7 +69,7 @@ namespace KiCadPanelAssyFG
         }
     }
 
-    internal class KiCadFootprintData
+    public class KiCadFootprintData
     {
         public List<LineF> OutlineSegments;
         public List<PointF> OutlinePolyPoints;
@@ -78,12 +78,14 @@ namespace KiCadPanelAssyFG
         public KiCadFootprintData()
         {
             OutlineSegments = new List<LineF>();
+            OutlinePolyPoints = new List<PointF>();
             outlineIsClosedPolygonalChain = false;
         }
 
         public KiCadFootprintData(List<LineF> outline)
         {
             OutlineSegments = outline;
+            OutlinePolyPoints = new List<PointF>();
             outlineIsClosedPolygonalChain = false;
         }
 

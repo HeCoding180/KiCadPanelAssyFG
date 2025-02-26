@@ -172,6 +172,8 @@ namespace KiCadPanelAssyFG
         public float Rotation { set; get; }
         public PlacementSide Side { set; get; }
 
+        public KiCadFootprintData FootprintData { set; get; }
+
         public PlacementDataLine()
         {
             Reference = "";
