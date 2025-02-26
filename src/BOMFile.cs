@@ -161,8 +161,7 @@ namespace KiCadPanelAssyFG
             Footprint = footprint;
             LCSC_PN = lcscPN;
 
-            Designators = new List<string>();
-            Designators.AddRange(designators);
+            Designators = new List<string>(designators);
         }
 
         public BOMDataLine(BOMDataLine bomDataLine)
@@ -171,8 +170,7 @@ namespace KiCadPanelAssyFG
             Footprint = bomDataLine.Footprint;
             LCSC_PN = bomDataLine.LCSC_PN;
 
-            Designators = new List<string>();
-            Designators.AddRange(bomDataLine.Designators);
+            Designators = new List<string>(bomDataLine.Designators);
         }
     }
 }

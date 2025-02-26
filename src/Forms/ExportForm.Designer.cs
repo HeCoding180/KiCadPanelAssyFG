@@ -54,6 +54,7 @@
             PlacementSideCol = new DataGridViewComboBoxColumn();
             PlacementPreviewPanel = new Panel();
             propertiesPanel = new Panel();
+            bReloadFootprints = new Button();
             fpDirsTextbox = new TextBox();
             lFootprintDirs = new Label();
             bottomOutlineColorTextbox = new TextBox();
@@ -187,6 +188,7 @@
             dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
             dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
             BOMTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            BOMTable.RowHeadersVisible = false;
             BOMTable.Size = new Size(406, 377);
             BOMTable.TabIndex = 0;
             // 
@@ -251,6 +253,7 @@
             dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
             dataGridViewCellStyle6.WrapMode = DataGridViewTriState.True;
             PlacementsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            PlacementsTable.RowHeadersVisible = false;
             PlacementsTable.Size = new Size(402, 377);
             PlacementsTable.TabIndex = 1;
             // 
@@ -305,11 +308,13 @@
             PlacementPreviewPanel.Name = "PlacementPreviewPanel";
             PlacementPreviewPanel.Size = new Size(812, 174);
             PlacementPreviewPanel.TabIndex = 0;
+            PlacementPreviewPanel.Paint += PlacementPreviewPanel_Paint;
             // 
             // propertiesPanel
             // 
             propertiesPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             propertiesPanel.AutoScroll = true;
+            propertiesPanel.Controls.Add(bReloadFootprints);
             propertiesPanel.Controls.Add(fpDirsTextbox);
             propertiesPanel.Controls.Add(lFootprintDirs);
             propertiesPanel.Controls.Add(bottomOutlineColorTextbox);
@@ -327,6 +332,19 @@
             propertiesPanel.Name = "propertiesPanel";
             propertiesPanel.Size = new Size(284, 504);
             propertiesPanel.TabIndex = 4;
+            // 
+            // bReloadFootprints
+            // 
+            bReloadFootprints.BackColor = Color.FromArgb(31, 31, 31);
+            bReloadFootprints.FlatAppearance.BorderColor = Color.FromArgb(66, 66, 66);
+            bReloadFootprints.FlatStyle = FlatStyle.Flat;
+            bReloadFootprints.Location = new Point(30, 338);
+            bReloadFootprints.Name = "bReloadFootprints";
+            bReloadFootprints.Size = new Size(241, 28);
+            bReloadFootprints.TabIndex = 14;
+            bReloadFootprints.Text = "Reload Footprints";
+            bReloadFootprints.UseVisualStyleBackColor = false;
+            bReloadFootprints.Click += bReloadFootprints_Click;
             // 
             // fpDirsTextbox
             // 
@@ -447,7 +465,7 @@
             // lExportProperties
             // 
             lExportProperties.AutoSize = true;
-            lExportProperties.Location = new Point(11, 351);
+            lExportProperties.Location = new Point(11, 381);
             lExportProperties.Name = "lExportProperties";
             lExportProperties.Size = new Size(97, 15);
             lExportProperties.TabIndex = 2;
@@ -456,7 +474,7 @@
             // separateFilesCheckbox
             // 
             separateFilesCheckbox.AutoSize = true;
-            separateFilesCheckbox.Location = new Point(25, 374);
+            separateFilesCheckbox.Location = new Point(25, 404);
             separateFilesCheckbox.Name = "separateFilesCheckbox";
             separateFilesCheckbox.Size = new Size(220, 19);
             separateFilesCheckbox.TabIndex = 0;
@@ -544,5 +562,6 @@
         private Label lBottomComponents;
         private Label lFootprintDirs;
         private TextBox fpDirsTextbox;
+        private Button bReloadFootprints;
     }
 }

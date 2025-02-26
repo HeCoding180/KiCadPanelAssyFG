@@ -15,7 +15,7 @@ namespace KiCadPanelAssyFG
         public int uniqueDesigns { private set; get; }
 
         private BOMFile PanelBOM;
-        private PlacementFile PanelPlacements;
+        private Dictionary<string, PlacementDataLine> PanelPlacements;
 
         private Color _TopOutlineColor;
         private Color _BottomOutlineColor;
@@ -56,7 +56,7 @@ namespace KiCadPanelAssyFG
             this.FormClosing += sender.ExportForm_Closing;
 
             PanelBOM = new BOMFile();
-            PanelPlacements = new PlacementFile();
+            PanelPlacements = new Dictionary<string, PlacementDataLine>();
 
             uniqueDesigns = 0;
 
@@ -116,7 +116,7 @@ namespace KiCadPanelAssyFG
                                 placementDataLines.RemoveAt(i);
                                 // Add reference suffix and add to panel placement data
                                 refPlacementDataLine.Reference += GetCurrentDesignSuffix();
-                                PanelPlacements.PlacementData.Add(refPlacementDataLine);
+                                PanelPlacements.Add(refPlacementDataLine.Reference, refPlacementDataLine);
                                 // Set match flags
                                 MatchFound_Local = true;
                                 MatchFound_DataLine = true;
@@ -155,6 +155,14 @@ namespace KiCadPanelAssyFG
             }
         }
 
+        public void addDesigns(List<DesignInfo> designs)
+        {
+            foreach (DesignInfo design in designs)
+            {
+                this.AddDesign(design);
+            }
+        }
+
         public void UpdateTables()
         {
             BOMTable.Rows.Clear();
@@ -176,7 +184,7 @@ namespace KiCadPanelAssyFG
             }
 
             PlacementsTable.Rows.Clear();
-            foreach (PlacementDataLine placementDataLine in PanelPlacements.PlacementData)
+            foreach (PlacementDataLine placementDataLine in PanelPlacements.Values)
             {
                 PlacementsTable.Rows.Add(
                     placementDataLine.Reference,
@@ -233,6 +241,16 @@ namespace KiCadPanelAssyFG
             Properties.Settings.Default.TopOutlineColor = TopOutlineColor;
             Properties.Settings.Default.BottomOutlineColor = BottomOutlineColor;
             Properties.Settings.Default.Save();
+        }
+
+        private void bReloadFootprints_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void PlacementPreviewPanel_Paint(object sender, PaintEventArgs e)
+        {
+
         }
     }
 }

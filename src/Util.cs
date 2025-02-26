@@ -8,6 +8,26 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace KiCadPanelAssyFG
 {
+    // Custom Enums
+    public enum PlacementSide
+    {
+        Undef,
+        Top,
+        Bottom
+    }
+
+    public struct LineF
+    {
+        public PointF StartPoint;
+        public PointF EndPoint;
+
+        public LineF(PointF startPoint, PointF endPoint)
+        {
+            StartPoint = startPoint;
+            EndPoint = endPoint;
+        }
+    }
+
     // Custom Exceptions
     public class ArgumentDataException : Exception
     {
@@ -16,14 +36,6 @@ namespace KiCadPanelAssyFG
         public ArgumentDataException(string message) : base(message) { }
 
         public ArgumentDataException(string message, Exception inner) : base(message, inner) { }
-    }
-    
-    // Custom Enums
-    public enum PlacementSide
-    {
-        Undef,
-        Top,
-        Bottom
     }
 
     // Dark mode title bar override methods
@@ -77,5 +89,23 @@ namespace KiCadPanelAssyFG
         /// </returns>
         [DllImport("DwmApi")]
         public static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, int[] attrValue, int attrSize);
+
+        public static PointF RotTransformPointF(PointF point, float rot)
+        {
+            return new PointF
+            {
+                X = point.X * degCos(rot) - point.Y * degSin(rot),
+                Y = point.Y * degCos(rot) + point.X * degSin(rot)
+            };
+        }
+
+        public static float degSin(float x)
+        {
+            return (float)Math.Sin(x * Math.PI / 180.0f);
+        }
+        public static float degCos(float x)
+        {
+            return (float)Math.Cos(x * Math.PI / 180.0f);
+        }
     }
 }

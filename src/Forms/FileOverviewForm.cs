@@ -7,7 +7,7 @@ namespace KiCadPanelAssyFG
     public partial class FileOverviewForm : Form
     {
         // Public readonly variables
-        public readonly bool GraphicsDebugEnabled = false;
+        public static readonly bool GraphicsDebugEnabled = false;
 
         // Public variables
         Dictionary<string, DesignInfo> Designs = new Dictionary<string, DesignInfo>();
