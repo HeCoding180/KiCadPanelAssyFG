@@ -53,6 +53,9 @@
             PlacementRotCol = new DataGridViewTextBoxColumn();
             PlacementSideCol = new DataGridViewComboBoxColumn();
             PlacementPreviewPanel = new Panel();
+            lProjectName = new Label();
+            ProjectNamePanel = new Panel();
+            ProjectNameTextbox = new TextBox();
             propertiesPanel = new Panel();
             bReloadFootprints = new Button();
             fpDirsTextbox = new TextBox();
@@ -84,6 +87,7 @@
             tableSplitcontainer.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)BOMTable).BeginInit();
             ((System.ComponentModel.ISupportInitialize)PlacementsTable).BeginInit();
+            ProjectNamePanel.SuspendLayout();
             propertiesPanel.SuspendLayout();
             SuspendLayout();
             // 
@@ -100,6 +104,8 @@
             // 
             // MainSplitContainer.Panel2
             // 
+            MainSplitContainer.Panel2.Controls.Add(lProjectName);
+            MainSplitContainer.Panel2.Controls.Add(ProjectNamePanel);
             MainSplitContainer.Panel2.Controls.Add(propertiesPanel);
             MainSplitContainer.Panel2.Controls.Add(bExport);
             MainSplitContainer.Panel2MinSize = 200;
@@ -310,6 +316,39 @@
             PlacementPreviewPanel.TabIndex = 0;
             PlacementPreviewPanel.Paint += PlacementPreviewPanel_Paint;
             // 
+            // lProjectName
+            // 
+            lProjectName.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            lProjectName.AutoSize = true;
+            lProjectName.Location = new Point(11, 460);
+            lProjectName.Name = "lProjectName";
+            lProjectName.Size = new Size(79, 15);
+            lProjectName.TabIndex = 9;
+            lProjectName.Text = "Project Name";
+            // 
+            // ProjectNamePanel
+            // 
+            ProjectNamePanel.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            ProjectNamePanel.BackColor = Color.FromArgb(31, 31, 31);
+            ProjectNamePanel.BorderStyle = BorderStyle.FixedSingle;
+            ProjectNamePanel.Controls.Add(ProjectNameTextbox);
+            ProjectNamePanel.Location = new Point(11, 483);
+            ProjectNamePanel.Name = "ProjectNamePanel";
+            ProjectNamePanel.Size = new Size(261, 25);
+            ProjectNamePanel.TabIndex = 8;
+            // 
+            // ProjectNameTextbox
+            // 
+            ProjectNameTextbox.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            ProjectNameTextbox.BackColor = Color.FromArgb(31, 31, 31);
+            ProjectNameTextbox.BorderStyle = BorderStyle.None;
+            ProjectNameTextbox.Font = new Font("Segoe UI", 9.75F);
+            ProjectNameTextbox.ForeColor = SystemColors.Control;
+            ProjectNameTextbox.Location = new Point(4, 3);
+            ProjectNameTextbox.Name = "ProjectNameTextbox";
+            ProjectNameTextbox.Size = new Size(252, 18);
+            ProjectNameTextbox.TabIndex = 1;
+            // 
             // propertiesPanel
             // 
             propertiesPanel.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -330,7 +369,7 @@
             propertiesPanel.Controls.Add(separateFilesCheckbox);
             propertiesPanel.Location = new Point(0, 0);
             propertiesPanel.Name = "propertiesPanel";
-            propertiesPanel.Size = new Size(284, 504);
+            propertiesPanel.Size = new Size(284, 457);
             propertiesPanel.TabIndex = 4;
             // 
             // bReloadFootprints
@@ -497,6 +536,7 @@
             bExport.TabIndex = 3;
             bExport.Text = "Export All Files";
             bExport.UseVisualStyleBackColor = false;
+            bExport.Click += bExport_Click;
             // 
             // ExportForm
             // 
@@ -513,6 +553,7 @@
             FormClosing += ExportForm_FormClosing;
             MainSplitContainer.Panel1.ResumeLayout(false);
             MainSplitContainer.Panel2.ResumeLayout(false);
+            MainSplitContainer.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)MainSplitContainer).EndInit();
             MainSplitContainer.ResumeLayout(false);
             DataPanel.ResumeLayout(false);
@@ -526,6 +567,8 @@
             tableSplitcontainer.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)BOMTable).EndInit();
             ((System.ComponentModel.ISupportInitialize)PlacementsTable).EndInit();
+            ProjectNamePanel.ResumeLayout(false);
+            ProjectNamePanel.PerformLayout();
             propertiesPanel.ResumeLayout(false);
             propertiesPanel.PerformLayout();
             ResumeLayout(false);
@@ -567,5 +610,8 @@
         private Label lFootprintDirs;
         private TextBox fpDirsTextbox;
         private Button bReloadFootprints;
+        private Panel ProjectNamePanel;
+        private TextBox ProjectNameTextbox;
+        private Label lProjectName;
     }
 }

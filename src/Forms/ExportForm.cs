@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KiCadPanelAssyFG.src;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -6,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -463,6 +465,69 @@ namespace KiCadPanelAssyFG
         private void VisibilityCheckbox_CheckedChanged(object sender, EventArgs e)
         {
             PlacementPreviewPanel.Refresh();
+        }
+
+        private void bExport_Click(object sender, EventArgs e)
+        {
+            string projectName = ProjectNameTextbox.Text.Replace(" ", "_");
+
+            string selectedOutputPath = "";
+
+            if (projectName == "")
+            {
+                MessageBox.Show("Please enter a project name.", "Project Name Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            // Check project name validity
+            if (!Regex.IsMatch(projectName, "^(?!^(PRN|AUX|CLOCK\\$|NUL|CON|COM[1-9]|LPT[1-9])$)[^<>:\\\"\\/\\|?*\\x00-\\x1F]+$"))
+            {
+                MessageBox.Show("The current project name contains invalid characters or is otherwise invalid. Please select a different name.", "Invalid Project Name Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            using (FolderBrowserDialog dialog = new FolderBrowserDialog())
+            {
+                dialog.Description = "Select a folder to save files in";
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    selectedOutputPath = dialog.SelectedPath;
+                }
+                else
+                {
+                    return;
+                }
+            }
+
+            if (!Directory.Exists(selectedOutputPath))
+            {
+                MessageBox.Show("The selected output directory does not seem to exist, please try again.", "Invalid output directory", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            AssyFilesGenerator filesGenerator = new AssyFilesGenerator(';');
+
+            // Generate BOM file
+            filesGenerator.ExportToFile(projectName + "_BOM.csv", selectedOutputPath, PanelBOM);
+
+            PlacementFile tempPanelPlacementFile = new PlacementFile();
+            foreach (string placementKey in PanelPlacements.Keys)
+            {
+                tempPanelPlacementFile.PlacementData.Add(PanelPlacements[placementKey]);
+            }
+
+            if (separateFilesCheckbox.Checked)
+            {
+                // Generate top placement file
+                filesGenerator.ExportToFile(projectName + "_top_pos.csv", selectedOutputPath, tempPanelPlacementFile, PlacementSide.Top);
+                // Generate bottom placement file
+                filesGenerator.ExportToFile(projectName + "_bottom_pos.csv", selectedOutputPath, tempPanelPlacementFile, PlacementSide.Bottom);
+            }
+            else
+            {
+                // Generate combined top and bottom placement file
+                filesGenerator.ExportToFile(projectName + "_pos.csv", selectedOutputPath, tempPanelPlacementFile);
+            }
         }
     }
 }

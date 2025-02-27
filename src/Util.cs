@@ -47,6 +47,15 @@ namespace KiCadPanelAssyFG
         public InvalidKiCadFootprintException(string message, Exception inner) : base(message, inner) { }
     }
 
+    public class IncompleteDataException : Exception
+    {
+        public IncompleteDataException() { }
+
+        public IncompleteDataException(string message) : base(message) { }
+
+        public IncompleteDataException(string message, Exception inner) : base(message, inner) { }
+    }
+
     // Dark mode title bar override methods
     public partial class FileOverviewForm : Form
     {
