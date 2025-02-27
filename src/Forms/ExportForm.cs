@@ -247,6 +247,7 @@ namespace KiCadPanelAssyFG
             if (colorDialog.ShowDialog() == DialogResult.OK)
             {
                 TopOutlineColor = colorDialog.Color;
+                PlacementPreviewPanel.Refresh();
             }
         }
 
@@ -260,6 +261,7 @@ namespace KiCadPanelAssyFG
             if (colorDialog.ShowDialog() == DialogResult.OK)
             {
                 BottomOutlineColor = colorDialog.Color;
+                PlacementPreviewPanel.Refresh();
             }
         }
 
