@@ -55,22 +55,22 @@ namespace KiCadPanelAssyFG
                     bool matchFound = false;
                     for (int j = 0; j < refSegmentsList.Count; j++)
                     {
-                        if (refSegmentsList[i].StartPoint == SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value)
+                        if (refSegmentsList[j].StartPoint == SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value)
                         {
                             // Check for triple point
-                            if (SegmentsMap.ContainsKey(refSegmentsList[i].StartPoint)) return false;
+                            if (SegmentsMap.ContainsKey(refSegmentsList[j].StartPoint)) return false;
 
-                            SegmentsMap.Add(refSegmentsList[i].StartPoint, refSegmentsList[i].EndPoint);
+                            SegmentsMap.Add(refSegmentsList[j].StartPoint, refSegmentsList[j].EndPoint);
                             refSegmentsList.RemoveAt(j);
                             matchFound = true;
                             break;
                         }
-                        else if (refSegmentsList[i].EndPoint == SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value)
+                        else if (refSegmentsList[j].EndPoint == SegmentsMap.ElementAt(SegmentsMap.Count - 1).Value)
                         {
                             // Check for triple point
-                            if (SegmentsMap.ContainsKey(refSegmentsList[i].EndPoint)) return false;
+                            if (SegmentsMap.ContainsKey(refSegmentsList[j].EndPoint)) return false;
 
-                            SegmentsMap.Add(refSegmentsList[i].EndPoint, refSegmentsList[i].StartPoint);
+                            SegmentsMap.Add(refSegmentsList[j].EndPoint, refSegmentsList[j].StartPoint);
                             refSegmentsList.RemoveAt(j);
                             matchFound = true;
                             break;
@@ -103,48 +103,150 @@ namespace KiCadPanelAssyFG
 
         public static KiCadFootprintData ParseKiCadFootprint(IEnumerable<string> rawData)
         {
-            List<LineF> outlineSegments = new List<LineF>();
             List<string> dataLines = rawData.ToList();
+
+            Dictionary<string, List<Dictionary<string, string>>> structuredFpData = new Dictionary<string, List<Dictionary<string, string>>>();
 
             for (int i = 0; i < dataLines.Count; i++)
             {
-                if (dataLines[i].Trim().Replace("\t", "").StartsWith("(fp_line") && dataLines.Skip(i).Take(5).Any(l => l.Contains("(layer \"F.CrtYd\")")))
+                Match startAdvancedPropertyMatch = Regex.Match(dataLines[i], "\\A\t\\((\\w+)\\Z");
+
+                if (startAdvancedPropertyMatch.Success)
                 {
-                    PointF startPoint = new PointF();
-                    PointF endPoint = new PointF();
+                    string propertyName = startAdvancedPropertyMatch.Groups[1].Value;
 
-                    bool startFound = false;
-                    bool endFound = false;
+                    bool subPropertyEndFound = false;
+                    int subPropertyLines = 0;
 
-                    for (int j = i; j < i + 5 && j < dataLines.Count; j++)
+                    string rawSubProperties = "";
+
+                    // Get sub property lines count
+                    for (; (i + subPropertyLines + 1) < dataLines.Count; subPropertyLines++)
                     {
-                        Match startMatch = Regex.Match(dataLines[j], "\\(start (-?\\d+\\.\\d*) (-?\\d+\\.\\d*)\\)");
-                        Match endMatch = Regex.Match(dataLines[j + 1], "\\(end (-?\\d+\\.\\d*) (-?\\d+\\.\\d*)\\)");
+                        if (dataLines[i + subPropertyLines + 1].StartsWith("\t)"))
+                        {
+                            subPropertyEndFound = true;
+                            break;
+                        }
+                        else
+                        {
+                            if (subPropertyLines > 0) rawSubProperties += "\n";
+                            rawSubProperties += dataLines[i + subPropertyLines + 1];
+                        }
+                    }
 
-                        if (startMatch.Success)
+                    if (subPropertyEndFound)
+                    {
+                        MatchCollection subPropertyMatches = Regex.Matches(rawSubProperties, "^\\t\\t\\(([\\w\"\\. \\-\\(\\)]+)\\)$|^\\t\\t\\(([\\w \\r\\n\\t\\(\\)\\.\\-]+?)\\n\\t\\t\\)$", RegexOptions.Multiline);
+
+                        Dictionary<string, string> subProperties = new Dictionary<string, string>();
+
+                        foreach (Match subPropertyMatch in subPropertyMatches)
                         {
-                            startPoint = new PointF
+                            if (subPropertyMatch.Groups[1].Success)
                             {
-                                X = float.Parse(startMatch.Groups[1].Value),
-                                Y = float.Parse(startMatch.Groups[2].Value)
-                            };
-                            startFound = true;
-                        }
-                        if (endMatch.Success)
-                        {
-                            startPoint = new PointF
+                                // Single line match
+                                string[] splitMatch = subPropertyMatch.Groups[1].Value.Replace("\"", "").Split(new char[] { ' ' }, 2);
+
+                                if (!subProperties.ContainsKey(splitMatch[0]))
+                                {
+                                    subProperties.Add(splitMatch[0], splitMatch[1]);
+                                }
+                            }
+                            else if (subPropertyMatch.Groups[2].Success)
                             {
-                                X = float.Parse(endMatch.Groups[1].Value),
-                                Y = float.Parse(endMatch.Groups[2].Value)
-                            };
-                            endFound = true;
+                                // Multi line match
+                                string[] splitMatch = subPropertyMatch.Groups[2].Value.Replace("\t", "").Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\"", "").Split(new char[] { ' ' }, 2);
+
+                                if (!subProperties.ContainsKey(splitMatch[0]))
+                                {
+                                    subProperties.Add(splitMatch[0], splitMatch[1]);
+                                }
+                            }
                         }
-                        if (startFound && endFound)
+
+                        if (structuredFpData.ContainsKey(propertyName))
                         {
-                            outlineSegments.Add(new LineF(startPoint, endPoint));
-                            // Skip handled data lines
-                            i = j;
+                            structuredFpData[propertyName].Add(subProperties);
                         }
+                        else
+                        {
+                            structuredFpData.Add(propertyName, new List<Dictionary<string, string>>().Append(subProperties).ToList());
+                        }
+                    }
+                    else
+                    {
+                        throw new InvalidKiCadFootprintException("File ended before property was finished");
+                    }
+
+                    // Skip handled lines
+                    i += subPropertyLines;
+                }
+            }
+
+            List<LineF> outlineSegments = new List<LineF>();
+
+            string layerFilter = "F.CrtYd";
+
+            // Check if footprint contains front courtyard lines
+            if (structuredFpData.ContainsKey("fp_line"))
+            {
+                foreach (Dictionary<string, string> line in structuredFpData["fp_line"])
+                {
+                    // Filter out unimportant layers
+                    if (!line["layer"].Contains(layerFilter)) continue;
+
+                    string[] startSplitStr = line["start"].Trim().Split(" ");
+                    string[] endSplitStr = line["end"].Trim().Split(" ");
+
+                    outlineSegments.Add(new LineF(new PointF(float.Parse(startSplitStr[0]), float.Parse(startSplitStr[1])), new PointF(float.Parse(endSplitStr[0]), float.Parse(endSplitStr[1]))));
+                }
+            }
+
+            // Check if footprint contains front courtyard rectangles
+            if (structuredFpData.ContainsKey("fp_rect"))
+            {
+                foreach (Dictionary<string, string> polyLine in structuredFpData["fp_rect"])
+                {
+                    // Filter out unimportant layers
+                    if (!polyLine["layer"].Contains(layerFilter)) continue;
+
+                    string[] startSplitStr = polyLine["start"].Trim().Split(" ");
+                    string[] endSplitStr = polyLine["end"].Trim().Split(" ");
+
+                    PointF startPoint = new PointF(float.Parse(startSplitStr[0]), float.Parse(startSplitStr[1]));
+                    PointF endPoint = new PointF(float.Parse(endSplitStr[0]), float.Parse(endSplitStr[1]));
+                    
+                    // Add rectangle to as individual segments
+                    outlineSegments.Add(new LineF(new PointF(startPoint.X, startPoint.Y), new PointF(endPoint.X, startPoint.Y)));
+                    outlineSegments.Add(new LineF(new PointF(endPoint.X, startPoint.Y), new PointF(endPoint.X, endPoint.Y)));
+                    outlineSegments.Add(new LineF(new PointF(endPoint.X, endPoint.Y), new PointF(startPoint.X, endPoint.Y)));
+                    outlineSegments.Add(new LineF(new PointF(startPoint.X, endPoint.Y), new PointF(startPoint.X, startPoint.Y)));
+                }
+            }
+
+            // Check if footprint contains front courtyard polygon lines
+            if (structuredFpData.ContainsKey("fp_poly"))
+            {
+                foreach (Dictionary<string, string> rect in structuredFpData["fp_poly"])
+                {
+                    // Filter out unimportant layers
+                    if (!rect["layer"].Contains(layerFilter)) continue;
+
+                    MatchCollection CoordinateMatches = Regex.Matches(rect["pts"], "\\(xy (-?\\d+.?\\d*) (-?\\d+.?\\d*)\\)");
+
+                    List<PointF> coordinates = new List<PointF>();
+
+                    foreach (Match CoordinateMatch in CoordinateMatches)
+                    {
+                        // Get all coordinates
+                        coordinates.Add(new PointF(float.Parse(CoordinateMatch.Groups[1].Value), float.Parse(CoordinateMatch.Groups[2].Value)));
+                    }
+
+                    for (int i = 0; i < coordinates.Count; i++)
+                    {
+                        // Generate segments
+                        outlineSegments.Add(new LineF(coordinates[i], coordinates[(i + 1) % coordinates.Count]));
                     }
                 }
             }

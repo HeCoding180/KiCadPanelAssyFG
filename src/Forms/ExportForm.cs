@@ -386,6 +386,7 @@ namespace KiCadPanelAssyFG
             }
 
             FootprintsLoaded = true;
+            PlacementPreviewPanel.Refresh();
         }
 
         private void PlacementPreviewPanel_Paint(object sender, PaintEventArgs e)
@@ -430,6 +431,11 @@ namespace KiCadPanelAssyFG
                     }
                 }
             }
+        }
+
+        private void VisibilityCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            PlacementPreviewPanel.Refresh();
         }
     }
 }

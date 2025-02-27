@@ -399,6 +399,7 @@
             bottomVisibleCheckbox.TabIndex = 9;
             bottomVisibleCheckbox.Text = "Visible";
             bottomVisibleCheckbox.UseVisualStyleBackColor = true;
+            bottomVisibleCheckbox.CheckedChanged += VisibilityCheckbox_CheckedChanged;
             // 
             // lBottomComponents
             // 
@@ -443,6 +444,7 @@
             topVisibleCheckbox.TabIndex = 5;
             topVisibleCheckbox.Text = "Visible";
             topVisibleCheckbox.UseVisualStyleBackColor = true;
+            topVisibleCheckbox.CheckedChanged += VisibilityCheckbox_CheckedChanged;
             // 
             // lTopComponents
             // 

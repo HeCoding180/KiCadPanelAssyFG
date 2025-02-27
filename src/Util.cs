@@ -38,6 +38,15 @@ namespace KiCadPanelAssyFG
         public ArgumentDataException(string message, Exception inner) : base(message, inner) { }
     }
 
+    public class InvalidKiCadFootprintException : Exception
+    {
+        public InvalidKiCadFootprintException() { }
+
+        public InvalidKiCadFootprintException(string message) : base(message) { }
+
+        public InvalidKiCadFootprintException(string message, Exception inner) : base(message, inner) { }
+    }
+
     // Dark mode title bar override methods
     public partial class FileOverviewForm : Form
     {
@@ -163,8 +172,8 @@ namespace KiCadPanelAssyFG
         {
             return new PointF
             {
-                X = point.X * degCos(alpha) - point.Y * degSin(alpha),
-                Y = point.Y * degCos(alpha) + point.X * degSin(alpha)
+                X = transformVec.X + point.X * degCos(alpha) - point.Y * degSin(alpha),
+                Y = transformVec.Y + point.Y * degCos(alpha) + point.X * degSin(alpha)
             };
         }
         public static LineF RotPosTransformLine(LineF line, PointF transformVec, float alpha)
