@@ -209,6 +209,48 @@ namespace KiCadPanelAssyFG
             return outputLines;
         }
 
+        // Scale & position transformation single
+        public static PointF ScalePosTransformPoint(PointF point, PointF transformVec, float scaleFactor)
+        {
+            return new PointF
+            {
+                X = transformVec.X + point.X * scaleFactor,
+                Y = transformVec.Y + point.Y * scaleFactor
+            };
+        }
+        public static LineF ScalePosTransformLine(LineF line, PointF transformVec, float scaleFactor)
+        {
+            return new LineF
+            {
+                StartPoint = ScalePosTransformPoint(line.StartPoint, transformVec, scaleFactor),
+                EndPoint = ScalePosTransformPoint(line.EndPoint, transformVec, scaleFactor)
+            };
+        }
+
+        // Scale & position transformation array
+        public static List<PointF> ScalePosTransformPoints(List<PointF> points, PointF transformVec, float scaleFactor)
+        {
+            List<PointF> outputPoints = new List<PointF>();
+
+            foreach (PointF p in points)
+            {
+                outputPoints.Add(ScalePosTransformPoint(p, transformVec, scaleFactor));
+            }
+
+            return outputPoints;
+        }
+        public static List<LineF> ScalePosTransformLines(List<LineF> lines, PointF transformVec, float scaleFactor)
+        {
+            List<LineF> outputLines = new List<LineF>();
+
+            foreach (LineF line in lines)
+            {
+                outputLines.Add(ScalePosTransformLine(line, transformVec, scaleFactor));
+            }
+
+            return outputLines;
+        }
+
         public static float degSin(float x)
         {
             return (float)Math.Sin(x * Math.PI / 180.0f);

@@ -335,6 +335,7 @@
             // 
             // bReloadFootprints
             // 
+            bReloadFootprints.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             bReloadFootprints.BackColor = Color.FromArgb(31, 31, 31);
             bReloadFootprints.FlatAppearance.BorderColor = Color.FromArgb(66, 66, 66);
             bReloadFootprints.FlatStyle = FlatStyle.Flat;
@@ -348,6 +349,7 @@
             // 
             // fpDirsTextbox
             // 
+            fpDirsTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             fpDirsTextbox.BackColor = Color.FromArgb(31, 31, 31);
             fpDirsTextbox.ForeColor = SystemColors.Control;
             fpDirsTextbox.Location = new Point(30, 232);

@@ -391,11 +391,32 @@ namespace KiCadPanelAssyFG
 
         private void PlacementPreviewPanel_Paint(object sender, PaintEventArgs e)
         {
+            Panel senderPanel = (Panel)sender;
+
             // Fill Background
             e.Graphics.Clear(Color.Black);
 
             if (FootprintsLoaded)
             {
+                // Calculate scaling and movement to resize and center the preview appropriately
+                float boundsWidth = (float)senderPanel.Size.Width - 20.0f;
+                float boundsHeight = (float)senderPanel.Size.Height - 20.0f;
+
+                PointF transformVec = new PointF(10.0f, 10.0f);
+
+                float previewScalingFactor = 1.0f;
+
+                if ((boundsWidth / boundsHeight) > (PreviewSize.Width / PreviewSize.Height))
+                {
+                    previewScalingFactor = boundsHeight / PreviewSize.Height;
+                    transformVec.X += (boundsWidth - previewScalingFactor * PreviewSize.Width) / 2;
+                }
+                else
+                {
+                    previewScalingFactor = boundsWidth / PreviewSize.Width;
+                    transformVec.Y += (boundsHeight - previewScalingFactor * PreviewSize.Height) / 2;
+                }
+
                 using (Pen TopOutlinePen = new Pen(TopOutlineColor),
                     BottomOutlinePen = new Pen(BottomOutlineColor))
                 using (Brush TopFillBrush = new SolidBrush(TopOutlineFillColor),
@@ -416,13 +437,17 @@ namespace KiCadPanelAssyFG
                             if (refFootprintData.outlineIsClosedPolygonalChain)
                             {
                                 // Outline is a closed polygonal chain
-                                e.Graphics.FillPolygon(FillBrush, refFootprintData.OutlinePolyPoints.ToArray());
-                                e.Graphics.DrawPolygon(OutlinePen, refFootprintData.OutlinePolyPoints.ToArray());
+                                List<PointF> scaledPoints = Util.ScalePosTransformPoints(refFootprintData.OutlinePolyPoints, transformVec, previewScalingFactor);
+
+                                e.Graphics.FillPolygon(FillBrush, scaledPoints.ToArray());
+                                e.Graphics.DrawPolygon(OutlinePen, scaledPoints.ToArray());
                             }
                             else
                             {
                                 // Outline is not a closed polygonal chain or contains stub or isolated segments
-                                foreach (LineF refLine in refFootprintData.OutlineSegments)
+                                List<LineF> scaledLines = Util.ScalePosTransformLines(refFootprintData.OutlineSegments, transformVec, previewScalingFactor);
+
+                                foreach (LineF refLine in scaledLines)
                                 {
                                     e.Graphics.DrawLine(OutlinePen, refLine.StartPoint, refLine.EndPoint);
                                 }
