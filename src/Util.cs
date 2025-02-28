@@ -115,8 +115,8 @@ namespace KiCadPanelAssyFG
         {
             return new PointF
             {
-                X = point.X * degCos(alpha) - point.Y * degSin(alpha),
-                Y = point.Y * degCos(alpha) + point.X * degSin(alpha)
+                X = point.X * degCos(-alpha) - point.Y * degSin(-alpha),
+                Y = point.Y * degCos(-alpha) + point.X * degSin(-alpha)
             };
         }
         public static LineF RotTransformLine(LineF line, float alpha)
@@ -181,8 +181,8 @@ namespace KiCadPanelAssyFG
         {
             return new PointF
             {
-                X = transformVec.X + point.X * degCos(alpha) - point.Y * degSin(alpha),
-                Y = transformVec.Y + point.Y * degCos(alpha) + point.X * degSin(alpha)
+                X = transformVec.X + point.X * degCos(-alpha) - point.Y * degSin(-alpha),
+                Y = transformVec.Y + point.Y * degCos(-alpha) + point.X * degSin(-alpha)
             };
         }
         public static LineF RotPosTransformLine(LineF line, PointF transformVec, float alpha)
