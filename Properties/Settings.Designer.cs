@@ -70,5 +70,17 @@ namespace KiCadPanelAssyFG.Properties {
                 this["BottomOutlineColor"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("50")]
+        public int BackgroundOpacity {
+            get {
+                return ((int)(this["BackgroundOpacity"]));
+            }
+            set {
+                this["BackgroundOpacity"] = value;
+            }
+        }
     }
 }

@@ -68,14 +68,14 @@ namespace KiCadPanelAssyFG
         {
             get
             {
-                return Color.FromArgb(128, TopOutlineColor);
+                return Color.FromArgb((int)Math.Round(255.0 * (double)bgOpacityTrackbar.Value / 100), TopOutlineColor);
             }
         }
         private Color BottomOutlineFillColor
         {
             get
             {
-                return Color.FromArgb(128, BottomOutlineColor);
+                return Color.FromArgb((int)Math.Round(255.0 * (double)bgOpacityTrackbar.Value / 100), BottomOutlineColor);
             }
         }
 
@@ -100,6 +100,7 @@ namespace KiCadPanelAssyFG
             separateFilesCheckbox.Checked = Properties.Settings.Default.UseSeparatePlacementFiles;
             TopOutlineColor = Properties.Settings.Default.TopOutlineColor;
             BottomOutlineColor = Properties.Settings.Default.BottomOutlineColor;
+            bgOpacityTrackbar.Value = Properties.Settings.Default.BackgroundOpacity;
         }
 
         public void AddDesign(DesignInfo design)
@@ -273,6 +274,7 @@ namespace KiCadPanelAssyFG
             Properties.Settings.Default.UseSeparatePlacementFiles = separateFilesCheckbox.Checked;
             Properties.Settings.Default.TopOutlineColor = TopOutlineColor;
             Properties.Settings.Default.BottomOutlineColor = BottomOutlineColor;
+            Properties.Settings.Default.BackgroundOpacity = bgOpacityTrackbar.Value;
             Properties.Settings.Default.Save();
         }
 
@@ -535,6 +537,11 @@ namespace KiCadPanelAssyFG
                 // Generate combined top and bottom placement file
                 filesGenerator.ExportToFile(projectName + "_pos.csv", selectedOutputPath, tempPanelPlacementFile);
             }
+        }
+
+        private void bgOppacityTrackbar_Scroll(object sender, EventArgs e)
+        {
+            PlacementPreviewPanel.Refresh();
         }
     }
 }

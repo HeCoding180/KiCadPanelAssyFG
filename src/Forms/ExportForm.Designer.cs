@@ -28,12 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle7 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle8 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle9 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle10 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle11 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle12 = new DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExportForm));
             MainSplitContainer = new SplitContainer();
             DataPanel = new Panel();
@@ -60,6 +60,10 @@
             bReloadFootprints = new Button();
             fpDirsTextbox = new TextBox();
             lFootprintDirs = new Label();
+            lExportProperties = new Label();
+            separateFilesCheckbox = new CheckBox();
+            lFillOpacity = new Label();
+            bgOpacityTrackbar = new TrackBar();
             bottomOutlineColorTextbox = new TextBox();
             lBottomColor = new Label();
             bottomVisibleCheckbox = new CheckBox();
@@ -69,8 +73,6 @@
             topVisibleCheckbox = new CheckBox();
             lTopComponents = new Label();
             lGeneralProperties = new Label();
-            lExportProperties = new Label();
-            separateFilesCheckbox = new CheckBox();
             bExport = new Button();
             ((System.ComponentModel.ISupportInitialize)MainSplitContainer).BeginInit();
             MainSplitContainer.Panel1.SuspendLayout();
@@ -89,6 +91,7 @@
             ((System.ComponentModel.ISupportInitialize)PlacementsTable).BeginInit();
             ProjectNamePanel.SuspendLayout();
             propertiesPanel.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)bgOpacityTrackbar).BeginInit();
             SuspendLayout();
             // 
             // MainSplitContainer
@@ -109,7 +112,7 @@
             MainSplitContainer.Panel2.Controls.Add(propertiesPanel);
             MainSplitContainer.Panel2.Controls.Add(bExport);
             MainSplitContainer.Panel2MinSize = 200;
-            MainSplitContainer.Size = new Size(1100, 555);
+            MainSplitContainer.Size = new Size(1100, 611);
             MainSplitContainer.SplitterDistance = 812;
             MainSplitContainer.TabIndex = 0;
             // 
@@ -119,7 +122,7 @@
             DataPanel.Dock = DockStyle.Fill;
             DataPanel.Location = new Point(0, 0);
             DataPanel.Name = "DataPanel";
-            DataPanel.Size = new Size(812, 555);
+            DataPanel.Size = new Size(812, 611);
             DataPanel.TabIndex = 0;
             // 
             // DataSplitcontainer
@@ -136,8 +139,8 @@
             // DataSplitcontainer.Panel2
             // 
             DataSplitcontainer.Panel2.Controls.Add(PlacementPreviewPanel);
-            DataSplitcontainer.Size = new Size(812, 555);
-            DataSplitcontainer.SplitterDistance = 377;
+            DataSplitcontainer.Size = new Size(812, 611);
+            DataSplitcontainer.SplitterDistance = 415;
             DataSplitcontainer.TabIndex = 0;
             // 
             // tableSplitcontainer
@@ -153,7 +156,7 @@
             // tableSplitcontainer.Panel2
             // 
             tableSplitcontainer.Panel2.Controls.Add(PlacementsTable);
-            tableSplitcontainer.Size = new Size(812, 377);
+            tableSplitcontainer.Size = new Size(812, 415);
             tableSplitcontainer.SplitterDistance = 406;
             tableSplitcontainer.TabIndex = 0;
             // 
@@ -163,39 +166,39 @@
             BOMTable.AllowUserToDeleteRows = false;
             BOMTable.AllowUserToOrderColumns = true;
             BOMTable.BackgroundColor = Color.FromArgb(31, 31, 31);
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = Color.FromArgb(31, 31, 31);
-            dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle1.ForeColor = SystemColors.Control;
-            dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
-            BOMTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle7.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle7.BackColor = Color.FromArgb(31, 31, 31);
+            dataGridViewCellStyle7.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle7.ForeColor = SystemColors.Control;
+            dataGridViewCellStyle7.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle7.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle7.WrapMode = DataGridViewTriState.True;
+            BOMTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
             BOMTable.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             BOMTable.Columns.AddRange(new DataGridViewColumn[] { BomValueCol, BomDesignatorsCol, BomFootprintCol, BomPartnoCol });
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = Color.FromArgb(31, 31, 31);
-            dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle2.ForeColor = SystemColors.Control;
-            dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
-            BOMTable.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle8.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle8.BackColor = Color.FromArgb(31, 31, 31);
+            dataGridViewCellStyle8.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle8.ForeColor = SystemColors.Control;
+            dataGridViewCellStyle8.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle8.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle8.WrapMode = DataGridViewTriState.False;
+            BOMTable.DefaultCellStyle = dataGridViewCellStyle8;
             BOMTable.Dock = DockStyle.Fill;
             BOMTable.GridColor = Color.FromArgb(66, 66, 66);
             BOMTable.Location = new Point(0, 0);
             BOMTable.Name = "BOMTable";
             BOMTable.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = Color.FromArgb(31, 31, 31);
-            dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle3.ForeColor = SystemColors.Control;
-            dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
-            BOMTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle9.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle9.BackColor = Color.FromArgb(31, 31, 31);
+            dataGridViewCellStyle9.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle9.ForeColor = SystemColors.Control;
+            dataGridViewCellStyle9.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle9.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle9.WrapMode = DataGridViewTriState.True;
+            BOMTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
             BOMTable.RowHeadersVisible = false;
-            BOMTable.Size = new Size(406, 377);
+            BOMTable.Size = new Size(406, 415);
             BOMTable.TabIndex = 0;
             // 
             // BomValueCol
@@ -228,39 +231,39 @@
             PlacementsTable.AllowUserToDeleteRows = false;
             PlacementsTable.AllowUserToOrderColumns = true;
             PlacementsTable.BackgroundColor = Color.FromArgb(31, 31, 31);
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = Color.FromArgb(31, 31, 31);
-            dataGridViewCellStyle4.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle4.ForeColor = SystemColors.Control;
-            dataGridViewCellStyle4.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = DataGridViewTriState.True;
-            PlacementsTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle10.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle10.BackColor = Color.FromArgb(31, 31, 31);
+            dataGridViewCellStyle10.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle10.ForeColor = SystemColors.Control;
+            dataGridViewCellStyle10.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle10.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle10.WrapMode = DataGridViewTriState.True;
+            PlacementsTable.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle10;
             PlacementsTable.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             PlacementsTable.Columns.AddRange(new DataGridViewColumn[] { PlacementRefCol, PlacementValueCol, PlacementFootprintCol, PlacementPosXCol, PlacementPosYCol, PlacementRotCol, PlacementSideCol });
-            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle5.BackColor = Color.FromArgb(31, 31, 31);
-            dataGridViewCellStyle5.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle5.ForeColor = SystemColors.Control;
-            dataGridViewCellStyle5.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle5.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = DataGridViewTriState.False;
-            PlacementsTable.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle11.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle11.BackColor = Color.FromArgb(31, 31, 31);
+            dataGridViewCellStyle11.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle11.ForeColor = SystemColors.Control;
+            dataGridViewCellStyle11.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle11.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle11.WrapMode = DataGridViewTriState.False;
+            PlacementsTable.DefaultCellStyle = dataGridViewCellStyle11;
             PlacementsTable.Dock = DockStyle.Fill;
             PlacementsTable.GridColor = Color.FromArgb(66, 66, 66);
             PlacementsTable.Location = new Point(0, 0);
             PlacementsTable.Name = "PlacementsTable";
             PlacementsTable.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = Color.FromArgb(31, 31, 31);
-            dataGridViewCellStyle6.Font = new Font("Segoe UI", 9F);
-            dataGridViewCellStyle6.ForeColor = SystemColors.Control;
-            dataGridViewCellStyle6.SelectionBackColor = SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = DataGridViewTriState.True;
-            PlacementsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle12.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle12.BackColor = Color.FromArgb(31, 31, 31);
+            dataGridViewCellStyle12.Font = new Font("Segoe UI", 9F);
+            dataGridViewCellStyle12.ForeColor = SystemColors.Control;
+            dataGridViewCellStyle12.SelectionBackColor = SystemColors.Highlight;
+            dataGridViewCellStyle12.SelectionForeColor = SystemColors.HighlightText;
+            dataGridViewCellStyle12.WrapMode = DataGridViewTriState.True;
+            PlacementsTable.RowHeadersDefaultCellStyle = dataGridViewCellStyle12;
             PlacementsTable.RowHeadersVisible = false;
-            PlacementsTable.Size = new Size(402, 377);
+            PlacementsTable.Size = new Size(402, 415);
             PlacementsTable.TabIndex = 1;
             // 
             // PlacementRefCol
@@ -312,7 +315,7 @@
             PlacementPreviewPanel.Dock = DockStyle.Fill;
             PlacementPreviewPanel.Location = new Point(0, 0);
             PlacementPreviewPanel.Name = "PlacementPreviewPanel";
-            PlacementPreviewPanel.Size = new Size(812, 174);
+            PlacementPreviewPanel.Size = new Size(812, 192);
             PlacementPreviewPanel.TabIndex = 0;
             PlacementPreviewPanel.Paint += PlacementPreviewPanel_Paint;
             // 
@@ -320,7 +323,7 @@
             // 
             lProjectName.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             lProjectName.AutoSize = true;
-            lProjectName.Location = new Point(11, 460);
+            lProjectName.Location = new Point(11, 516);
             lProjectName.Name = "lProjectName";
             lProjectName.Size = new Size(79, 15);
             lProjectName.TabIndex = 9;
@@ -332,7 +335,7 @@
             ProjectNamePanel.BackColor = Color.FromArgb(31, 31, 31);
             ProjectNamePanel.BorderStyle = BorderStyle.FixedSingle;
             ProjectNamePanel.Controls.Add(ProjectNameTextbox);
-            ProjectNamePanel.Location = new Point(11, 483);
+            ProjectNamePanel.Location = new Point(11, 539);
             ProjectNamePanel.Name = "ProjectNamePanel";
             ProjectNamePanel.Size = new Size(261, 25);
             ProjectNamePanel.TabIndex = 8;
@@ -356,6 +359,10 @@
             propertiesPanel.Controls.Add(bReloadFootprints);
             propertiesPanel.Controls.Add(fpDirsTextbox);
             propertiesPanel.Controls.Add(lFootprintDirs);
+            propertiesPanel.Controls.Add(lExportProperties);
+            propertiesPanel.Controls.Add(separateFilesCheckbox);
+            propertiesPanel.Controls.Add(lFillOpacity);
+            propertiesPanel.Controls.Add(bgOpacityTrackbar);
             propertiesPanel.Controls.Add(bottomOutlineColorTextbox);
             propertiesPanel.Controls.Add(lBottomColor);
             propertiesPanel.Controls.Add(bottomVisibleCheckbox);
@@ -365,11 +372,9 @@
             propertiesPanel.Controls.Add(topVisibleCheckbox);
             propertiesPanel.Controls.Add(lTopComponents);
             propertiesPanel.Controls.Add(lGeneralProperties);
-            propertiesPanel.Controls.Add(lExportProperties);
-            propertiesPanel.Controls.Add(separateFilesCheckbox);
             propertiesPanel.Location = new Point(0, 0);
             propertiesPanel.Name = "propertiesPanel";
-            propertiesPanel.Size = new Size(284, 457);
+            propertiesPanel.Size = new Size(284, 513);
             propertiesPanel.TabIndex = 4;
             // 
             // bReloadFootprints
@@ -378,9 +383,9 @@
             bReloadFootprints.BackColor = Color.FromArgb(31, 31, 31);
             bReloadFootprints.FlatAppearance.BorderColor = Color.FromArgb(66, 66, 66);
             bReloadFootprints.FlatStyle = FlatStyle.Flat;
-            bReloadFootprints.Location = new Point(30, 338);
+            bReloadFootprints.Location = new Point(30, 398);
             bReloadFootprints.Name = "bReloadFootprints";
-            bReloadFootprints.Size = new Size(241, 28);
+            bReloadFootprints.Size = new Size(242, 28);
             bReloadFootprints.TabIndex = 14;
             bReloadFootprints.Text = "Reload Footprints";
             bReloadFootprints.UseVisualStyleBackColor = false;
@@ -391,20 +396,61 @@
             fpDirsTextbox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             fpDirsTextbox.BackColor = Color.FromArgb(31, 31, 31);
             fpDirsTextbox.ForeColor = SystemColors.Control;
-            fpDirsTextbox.Location = new Point(30, 232);
+            fpDirsTextbox.Location = new Point(30, 292);
             fpDirsTextbox.Multiline = true;
             fpDirsTextbox.Name = "fpDirsTextbox";
-            fpDirsTextbox.Size = new Size(241, 100);
+            fpDirsTextbox.Size = new Size(242, 100);
             fpDirsTextbox.TabIndex = 13;
             // 
             // lFootprintDirs
             // 
             lFootprintDirs.AutoSize = true;
-            lFootprintDirs.Location = new Point(25, 205);
+            lFootprintDirs.Location = new Point(25, 265);
             lFootprintDirs.Name = "lFootprintDirs";
             lFootprintDirs.Size = new Size(188, 15);
             lFootprintDirs.TabIndex = 12;
             lFootprintDirs.Text = "Footprint Directories (one per line)";
+            // 
+            // lExportProperties
+            // 
+            lExportProperties.AutoSize = true;
+            lExportProperties.Location = new Point(11, 441);
+            lExportProperties.Name = "lExportProperties";
+            lExportProperties.Size = new Size(97, 15);
+            lExportProperties.TabIndex = 2;
+            lExportProperties.Text = "Export Properties";
+            // 
+            // separateFilesCheckbox
+            // 
+            separateFilesCheckbox.AutoSize = true;
+            separateFilesCheckbox.Location = new Point(25, 464);
+            separateFilesCheckbox.Name = "separateFilesCheckbox";
+            separateFilesCheckbox.Size = new Size(220, 19);
+            separateFilesCheckbox.TabIndex = 0;
+            separateFilesCheckbox.Text = "Separate top/bottom placement files";
+            separateFilesCheckbox.UseVisualStyleBackColor = true;
+            // 
+            // lFillOpacity
+            // 
+            lFillOpacity.AutoSize = true;
+            lFillOpacity.Location = new Point(25, 205);
+            lFillOpacity.Name = "lFillOpacity";
+            lFillOpacity.Size = new Size(182, 15);
+            lFillOpacity.TabIndex = 16;
+            lFillOpacity.Text = "Preview Components Fill Opacity";
+            // 
+            // bgOpacityTrackbar
+            // 
+            bgOpacityTrackbar.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            bgOpacityTrackbar.LargeChange = 10;
+            bgOpacityTrackbar.Location = new Point(30, 223);
+            bgOpacityTrackbar.Maximum = 100;
+            bgOpacityTrackbar.Name = "bgOpacityTrackbar";
+            bgOpacityTrackbar.Size = new Size(238, 45);
+            bgOpacityTrackbar.SmallChange = 5;
+            bgOpacityTrackbar.TabIndex = 15;
+            bgOpacityTrackbar.TickFrequency = 5;
+            bgOpacityTrackbar.Scroll += bgOppacityTrackbar_Scroll;
             // 
             // bottomOutlineColorTextbox
             // 
@@ -414,7 +460,7 @@
             bottomOutlineColorTextbox.Location = new Point(114, 166);
             bottomOutlineColorTextbox.Name = "bottomOutlineColorTextbox";
             bottomOutlineColorTextbox.ReadOnly = true;
-            bottomOutlineColorTextbox.Size = new Size(157, 23);
+            bottomOutlineColorTextbox.Size = new Size(158, 23);
             bottomOutlineColorTextbox.TabIndex = 11;
             bottomOutlineColorTextbox.Text = "#24ecfc";
             bottomOutlineColorTextbox.TextAlign = HorizontalAlignment.Center;
@@ -459,7 +505,7 @@
             topOutlineColorTextbox.Location = new Point(114, 81);
             topOutlineColorTextbox.Name = "topOutlineColorTextbox";
             topOutlineColorTextbox.ReadOnly = true;
-            topOutlineColorTextbox.Size = new Size(157, 23);
+            topOutlineColorTextbox.Size = new Size(158, 23);
             topOutlineColorTextbox.TabIndex = 7;
             topOutlineColorTextbox.Text = "#fc24e4";
             topOutlineColorTextbox.TextAlign = HorizontalAlignment.Center;
@@ -505,32 +551,13 @@
             lGeneralProperties.TabIndex = 1;
             lGeneralProperties.Text = "General Properties";
             // 
-            // lExportProperties
-            // 
-            lExportProperties.AutoSize = true;
-            lExportProperties.Location = new Point(11, 381);
-            lExportProperties.Name = "lExportProperties";
-            lExportProperties.Size = new Size(97, 15);
-            lExportProperties.TabIndex = 2;
-            lExportProperties.Text = "Export Properties";
-            // 
-            // separateFilesCheckbox
-            // 
-            separateFilesCheckbox.AutoSize = true;
-            separateFilesCheckbox.Location = new Point(25, 404);
-            separateFilesCheckbox.Name = "separateFilesCheckbox";
-            separateFilesCheckbox.Size = new Size(220, 19);
-            separateFilesCheckbox.TabIndex = 0;
-            separateFilesCheckbox.Text = "Separate top/bottom placement files";
-            separateFilesCheckbox.UseVisualStyleBackColor = true;
-            // 
             // bExport
             // 
             bExport.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             bExport.BackColor = Color.FromArgb(31, 31, 31);
             bExport.FlatAppearance.BorderColor = Color.FromArgb(66, 66, 66);
             bExport.FlatStyle = FlatStyle.Flat;
-            bExport.Location = new Point(11, 514);
+            bExport.Location = new Point(11, 570);
             bExport.Name = "bExport";
             bExport.Size = new Size(261, 30);
             bExport.TabIndex = 3;
@@ -543,7 +570,7 @@
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.FromArgb(26, 26, 26);
-            ClientSize = new Size(1100, 555);
+            ClientSize = new Size(1100, 611);
             Controls.Add(MainSplitContainer);
             ForeColor = SystemColors.Control;
             Icon = (Icon)resources.GetObject("$this.Icon");
@@ -571,6 +598,7 @@
             ProjectNamePanel.PerformLayout();
             propertiesPanel.ResumeLayout(false);
             propertiesPanel.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)bgOpacityTrackbar).EndInit();
             ResumeLayout(false);
         }
 
@@ -613,5 +641,7 @@
         private Panel ProjectNamePanel;
         private TextBox ProjectNameTextbox;
         private Label lProjectName;
+        private TrackBar bgOpacityTrackbar;
+        private Label lFillOpacity;
     }
 }
