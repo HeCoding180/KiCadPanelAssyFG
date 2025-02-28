@@ -332,8 +332,15 @@ namespace KiCadPanelAssyFG
                 PlacementDataLine refDataLine = PanelPlacements[placementKey];
                 KiCadFootprintData refFootprintData = refDataLine.FootprintData;
 
+                // Flip position y axis
+                PointF graphicalFootprintPos = new PointF
+                {
+                    X = refDataLine.Position.X,
+                    Y = -refDataLine.Position.Y
+                };
+
                 // Apply footprint rotation and position transformation to outline segments
-                refFootprintData.OutlineSegments = Util.RotPosTransformLines(refFootprintData.OutlineSegments, refDataLine.Position, refDataLine.Rotation);
+                refFootprintData.OutlineSegments = Util.RotPosTransformLines(refFootprintData.OutlineSegments, graphicalFootprintPos, refDataLine.Rotation);
 
                 // Try build closed polygonal line, get bounds
                 if (refFootprintData.TryBuildClosedPolygonalLine())
