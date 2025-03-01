@@ -297,6 +297,147 @@ namespace KiCadPanelAssyFG
                     placementDataLine.Rotation.ToString());
             }
         }
+
+        /// <summary>
+        /// Public method used to load all footprints and update the preview
+        /// </summary>
+        public void LoadFootprints()
+        {
+            // Check if any footprint directories have been added by the user
+            if (KiCadFootprintDirs.Length == 0)
+                return;
+
+            bool AllFootprintsFound = true;
+
+            // Iterate through all BOM data lines
+            foreach (BOMDataLine bomDataLine in PanelBOM.BOMData.Values)
+            {
+                string fullFootprintDir = "";
+                bool dirFound = false;
+
+                // Iterate through all footprint directories to search for matching footprints
+                foreach (string footprintDirectory in KiCadFootprintDirs)
+                {
+                    // Generate footprint path from directory and footprint name
+                    fullFootprintDir = (footprintDirectory.Trim().Replace("/", "\\") + "\\" + KiCadFootprintUtil.GetRelativePathFromFootprintName(bomDataLine.Footprint)).Replace("\\\\", "\\");
+
+                    // Check if footprint exists
+                    if (File.Exists(fullFootprintDir))
+                    {
+                        dirFound = true;
+                        break;
+                    }
+                }
+
+                if (dirFound)
+                {
+                    // matching footprint file found
+                    KiCadFootprintData partFootprintData = KiCadFootprintParser.ParseKiCadFootprint(fullFootprintDir);
+
+                    // Iterate through all reference designators from this BOM line and uppdate matching placements
+                    foreach (string reference in bomDataLine.References)
+                    {
+                        if (PanelPlacements.ContainsKey(reference))
+                            PanelPlacements[reference].FootprintData = new KiCadFootprintData(partFootprintData);
+                    }
+                }
+                else
+                {
+                    // Some footprints are missing
+                    AllFootprintsFound = false;
+                    continue;
+                }
+            }
+
+            if (!AllFootprintsFound)
+            {
+                // Not all footprints were found, ask user if he still wants to continue
+                if (MessageBox.Show("Not all footprints were found press \"OK\" to continue, press \"cancel\" to abort.", "Footprints missing", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) != DialogResult.OK)
+                {
+                    // User chose to abort
+                    return;
+                }
+            }
+
+            float minX = float.MaxValue;
+            float minY = float.MaxValue;
+            float maxX = float.MinValue;
+            float maxY = float.MinValue;
+
+            // Apply rotation and position transformations
+            foreach (string placementKey in PanelPlacements.Keys)
+            {
+                PlacementDataLine refDataLine = PanelPlacements[placementKey];
+                KiCadFootprintData refFootprintData = refDataLine.FootprintData;
+
+                // Flip position Y values
+                PointF graphicalFootprintPos = new PointF
+                {
+                    X = refDataLine.Position.X,
+                    Y = -refDataLine.Position.Y
+                };
+
+                // Apply footprint rotation and position transformation to outline segments
+                refFootprintData.OutlineSegments = Util.RotPosTransformLines(refFootprintData.OutlineSegments, graphicalFootprintPos, refDataLine.Rotation);
+
+                // Try build closed polygonal line, get bounds
+                if (refFootprintData.TryBuildClosedPolygonalLine())
+                {
+                    // Outline is a closed polygonal chain
+                    foreach (PointF refPoint in refFootprintData.OutlinePolyPoints)
+                    {
+                        // (Re)calculate min point
+                        minX = float.Min(refPoint.X, minX);
+                        minY = float.Min(refPoint.Y, minY);
+
+                        // (Re)calculate max point
+                        maxX = float.Max(refPoint.X, maxX);
+                        maxY = float.Max(refPoint.Y, maxY);
+                    }
+                }
+                else
+                {
+                    // Outline is not a closed polygonal chain or contains stub or isolated segments
+                    foreach (LineF refLine in refFootprintData.OutlineSegments)
+                    {
+                        // (Re)calculate min point
+                        minX = float.Min(refLine.StartPoint.X, float.Min(refLine.EndPoint.X, minX));
+                        minY = float.Min(refLine.StartPoint.Y, float.Min(refLine.EndPoint.Y, minY));
+
+                        // (Re)calculate max point
+                        maxX = float.Max(refLine.StartPoint.X, float.Max(refLine.EndPoint.X, maxX));
+                        maxY = float.Max(refLine.StartPoint.Y, float.Max(refLine.EndPoint.Y, maxY));
+                    }
+                }
+            }
+
+            // Calculate unscaled size of the preview
+            PreviewSize = new SizeF(maxX - minX, maxY - minY);
+            PointF zeroTransformVector = new PointF(-minX, -minY);
+
+            // Apply position transform 
+            foreach (string placementKey in PanelPlacements.Keys)
+            {
+                PlacementDataLine refDataLine = PanelPlacements[placementKey];
+                KiCadFootprintData refFootprintData = refDataLine.FootprintData;
+
+                if (refFootprintData.outlineIsClosedPolygonalChain)
+                {
+                    // Outline is a closed polygonal chain
+                    refFootprintData.OutlineSegments = Util.PosTransformLines(refFootprintData.OutlineSegments, zeroTransformVector);
+                    refFootprintData.OutlinePolyPoints = Util.PosTransformPoints(refFootprintData.OutlinePolyPoints, zeroTransformVector);
+                }
+                else
+                {
+                    // Outline is not a closed polygonal chain or contains stub or isolated segments
+                    refFootprintData.OutlineSegments = Util.PosTransformLines(refFootprintData.OutlineSegments, zeroTransformVector);
+                }
+            }
+
+            // All footprints were loaded, refresh placements preview
+            FootprintsLoaded = true;
+            PlacementPreviewPanel.Refresh();
+        }
         #endregion
 
         //   ---   Private Methods   ---
@@ -474,136 +615,7 @@ namespace KiCadPanelAssyFG
 
         private void bReloadFootprints_Click(object sender, EventArgs e)
         {
-            bool AllFootprintsFound = true;
-
-            // Iterate through all BOM data lines
-            foreach (BOMDataLine bomDataLine in PanelBOM.BOMData.Values)
-            {
-                string fullFootprintDir = "";
-                bool dirFound = false;
-
-                // Iterate through all footprint directories to search for matching footprints
-                foreach (string footprintDirectory in KiCadFootprintDirs)
-                {
-                    // Generate footprint path from directory and footprint name
-                    fullFootprintDir = (footprintDirectory.Trim().Replace("/", "\\") + "\\" + KiCadFootprintUtil.GetRelativePathFromFootprintName(bomDataLine.Footprint)).Replace("\\\\", "\\");
-
-                    // Check if footprint exists
-                    if (File.Exists(fullFootprintDir))
-                    {
-                        dirFound = true;
-                        break;
-                    }
-                }
-
-                if (dirFound)
-                {
-                    // matching footprint file found
-                    KiCadFootprintData partFootprintData = KiCadFootprintParser.ParseKiCadFootprint(fullFootprintDir);
-
-                    // Iterate through all reference designators from this BOM line and uppdate matching placements
-                    foreach (string reference in bomDataLine.References)
-                    {
-                        if (PanelPlacements.ContainsKey(reference))
-                            PanelPlacements[reference].FootprintData = new KiCadFootprintData(partFootprintData);
-                    }
-                }
-                else
-                {
-                    // Some footprints are missing
-                    AllFootprintsFound = false;
-                    continue;
-                }
-            }
-
-            if (!AllFootprintsFound)
-            {
-                // Not all footprints were found, ask user if he still wants to continue
-                if (MessageBox.Show("Not all footprints were found press \"OK\" to continue, press \"cancel\" to abort.", "Footprints missing", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) != DialogResult.OK)
-                {
-                    // User chose to abort
-                    return;
-                }
-            }
-
-            float minX = float.MaxValue;
-            float minY = float.MaxValue;
-            float maxX = float.MinValue;
-            float maxY = float.MinValue;
-
-            // Apply rotation and position transformations
-            foreach (string placementKey in PanelPlacements.Keys)
-            {
-                PlacementDataLine refDataLine = PanelPlacements[placementKey];
-                KiCadFootprintData refFootprintData = refDataLine.FootprintData;
-
-                // Flip position Y values
-                PointF graphicalFootprintPos = new PointF
-                {
-                    X = refDataLine.Position.X,
-                    Y = -refDataLine.Position.Y
-                };
-
-                // Apply footprint rotation and position transformation to outline segments
-                refFootprintData.OutlineSegments = Util.RotPosTransformLines(refFootprintData.OutlineSegments, graphicalFootprintPos, refDataLine.Rotation);
-
-                // Try build closed polygonal line, get bounds
-                if (refFootprintData.TryBuildClosedPolygonalLine())
-                {
-                    // Outline is a closed polygonal chain
-                    foreach (PointF refPoint in refFootprintData.OutlinePolyPoints)
-                    {
-                        // (Re)calculate min point
-                        minX = float.Min(refPoint.X, minX);
-                        minY = float.Min(refPoint.Y, minY);
-
-                        // (Re)calculate max point
-                        maxX = float.Max(refPoint.X, maxX);
-                        maxY = float.Max(refPoint.Y, maxY);
-                    }
-                }
-                else
-                {
-                    // Outline is not a closed polygonal chain or contains stub or isolated segments
-                    foreach (LineF refLine in refFootprintData.OutlineSegments)
-                    {
-                        // (Re)calculate min point
-                        minX = float.Min(refLine.StartPoint.X, float.Min(refLine.EndPoint.X, minX));
-                        minY = float.Min(refLine.StartPoint.Y, float.Min(refLine.EndPoint.Y, minY));
-
-                        // (Re)calculate max point
-                        maxX = float.Max(refLine.StartPoint.X, float.Max(refLine.EndPoint.X, maxX));
-                        maxY = float.Max(refLine.StartPoint.Y, float.Max(refLine.EndPoint.Y, maxY));
-                    }
-                }
-            }
-
-            // Calculate unscaled size of the preview
-            PreviewSize = new SizeF(maxX - minX, maxY - minY);
-            PointF zeroTransformVector = new PointF(-minX, -minY);
-
-            // Apply position transform 
-            foreach (string placementKey in PanelPlacements.Keys)
-            {
-                PlacementDataLine refDataLine = PanelPlacements[placementKey];
-                KiCadFootprintData refFootprintData = refDataLine.FootprintData;
-
-                if (refFootprintData.outlineIsClosedPolygonalChain)
-                {
-                    // Outline is a closed polygonal chain
-                    refFootprintData.OutlineSegments = Util.PosTransformLines(refFootprintData.OutlineSegments, zeroTransformVector);
-                    refFootprintData.OutlinePolyPoints = Util.PosTransformPoints(refFootprintData.OutlinePolyPoints, zeroTransformVector);
-                }
-                else
-                {
-                    // Outline is not a closed polygonal chain or contains stub or isolated segments
-                    refFootprintData.OutlineSegments = Util.PosTransformLines(refFootprintData.OutlineSegments, zeroTransformVector);
-                }
-            }
-
-            // All footprints were loaded, refresh placements preview
-            FootprintsLoaded = true;
-            PlacementPreviewPanel.Refresh();
+            LoadFootprints();
         }
 
         private void bExport_Click(object sender, EventArgs e)

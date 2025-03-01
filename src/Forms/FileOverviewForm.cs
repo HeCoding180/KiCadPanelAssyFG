@@ -281,6 +281,8 @@ namespace KiCadPanelAssyFG
 
                 ExportWin.UpdateTables();
 
+                ExportWin.LoadFootprints();
+
                 ExportWinActive = true;
             }
         }
