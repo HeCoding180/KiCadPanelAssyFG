@@ -15,8 +15,16 @@ namespace KiCadPanelAssyFG
 {
     public partial class ExportForm : Form
     {
+        //   ---   Public Properties   ---
+        #region PUBLIC_PROPERTIES
+        /// <summary>
+        /// Number of unique designs. Used to generate the reference suffix
+        /// </summary>
         public int uniqueDesigns { private set; get; }
 
+        /// <summary>
+        /// Getter property that returns a list of all footprint directories entered by the user.
+        /// </summary>
         public string[] KiCadFootprintDirs
         {
             get
@@ -25,16 +33,35 @@ namespace KiCadPanelAssyFG
             }
         }
 
+        /// <summary>
+        /// True once the footprints have been loaded once.
+        /// </summary>
         public bool FootprintsLoaded { private set; get; }
+        #endregion
 
+        //   ---   Private Properties   ---
+        #region PRIVATE_PROPERTIES
+        /// <summary>
+        /// Combined BOM file containing all design's BOMs with the newly generated reference designators.
+        /// </summary>
         private BOMFile PanelBOM;
+        /// <summary>
+        /// Dictionary containing the data of all placements. Keys are the placements' reference designators.
+        /// </summary>
         private Dictionary<string, PlacementDataLine> PanelPlacements;
 
+        /// <summary>
+        /// Size of all unscaled component's outlines. Used to calculate the appropriate scaling factor for the outline segments.
+        /// </summary>
         private SizeF PreviewSize;
 
         private Color _TopOutlineColor;
         private Color _BottomOutlineColor;
 
+        /// <summary>
+        /// Property containing the color used to display parts placed on the top side of the PCB.
+        /// Automatically updates the top outline color textbox's colors and text.
+        /// </summary>
         private Color TopOutlineColor
         {
             set
@@ -49,6 +76,10 @@ namespace KiCadPanelAssyFG
                 return _TopOutlineColor;
             }
         }
+        /// <summary>
+        /// Property containing the color used to display parts placed on the bottom side of the PCB.
+        /// Automatically updates the bottom outline color textbox's colors and text.
+        /// </summary>
         private Color BottomOutlineColor
         {
             set
@@ -64,6 +95,10 @@ namespace KiCadPanelAssyFG
             }
         }
 
+        /// <summary>
+        /// Getter property that returns the RGB value from the <c><b>TopOutlineColor</b></c> property and modifies the opacity according to the opacity slider's value.
+        /// This color is used for the brushes used to fill the preview outlines.
+        /// </summary>
         private Color TopOutlineFillColor
         {
             get
@@ -71,6 +106,10 @@ namespace KiCadPanelAssyFG
                 return Color.FromArgb((int)Math.Round(255.0 * (double)bgOpacityTrackbar.Value / 100), TopOutlineColor);
             }
         }
+        /// <summary>
+        /// Getter property that returns the RGB value from the <c><b>BottomOutlineColor</b></c> property and modifies the opacity according to the opacity slider's value.
+        /// This color is used for the brushes used to fill the preview outlines.
+        /// </summary>
         private Color BottomOutlineFillColor
         {
             get
@@ -78,7 +117,9 @@ namespace KiCadPanelAssyFG
                 return Color.FromArgb((int)Math.Round(255.0 * (double)bgOpacityTrackbar.Value / 100), BottomOutlineColor);
             }
         }
+        #endregion
 
+        //   ---   Constructor   ---
         public ExportForm(FileOverviewForm sender)
         {
             InitializeComponent();
@@ -94,7 +135,7 @@ namespace KiCadPanelAssyFG
 
             FootprintsLoaded = false;
 
-            // Load Settings
+            // Load settings from settings file
             Properties.Settings.Default.Reload();
             fpDirsTextbox.Text = Properties.Settings.Default.FootprintDirs;
             separateFilesCheckbox.Checked = Properties.Settings.Default.UseSeparatePlacementFiles;
@@ -103,9 +144,15 @@ namespace KiCadPanelAssyFG
             bgOpacityTrackbar.Value = Properties.Settings.Default.BackgroundOpacity;
         }
 
+        //   ---   Public Methods   ---
+        #region PUBLIC_METHODS
+        /// <summary>
+        /// Method used to add a design to the list of all designs. This function automatically generates the suffixes for the reference designators.
+        /// </summary>
+        /// <param name="design">Design that is to be added to the output BOM and placement file.</param>
         public void AddDesign(DesignInfo design)
         {
-            // Create list of all placements related to this design
+            // Create list of all placements contained in this design
             List<PlacementDataLine> placementDataLines = new List<PlacementDataLine>();
             foreach (string placementKey in design.Placements.Keys)
             {
@@ -117,24 +164,26 @@ namespace KiCadPanelAssyFG
             {
                 // Temporary BOM used to build BOM for merge
                 BOMFile tempBOM = new BOMFile();
-                /// <summary>
-                /// Variable used to track if <b>any</b> BOM item was found in the placements list
-                /// </summary>
+                // Variable used to track if any BOM item was found in the placements list
                 bool MatchFound_FullBOM = false;
 
                 // Iterate through all BOM Data lines
                 foreach (string PartNo in design.BOMFileData.BOMData.Keys)
                 {
                     BOMDataLine refBomDataLine = design.BOMFileData.BOMData[PartNo];
+
+                    // Create new BOM dataline without any references and copy the remaining properties
                     BOMDataLine outputBomDataLine = new BOMDataLine(refBomDataLine.Value, refBomDataLine.Footprint, refBomDataLine.LCSC_PN);
 
                     bool MatchFound_DataLine = false;
 
+                    // Iterate through all references of the current bom data line
                     foreach (string currentDesignator in refBomDataLine.References)
                     {
                         PlacementDataLine refPlacementDataLine;
                         bool MatchFound_Local = false;
 
+                        // Add reference with suffix to the current output BOM line
                         outputBomDataLine.References.Add(currentDesignator + GetCurrentDesignSuffix());
 
                         for (int i = 0; i < placementDataLines.Count; i++)
@@ -159,24 +208,27 @@ namespace KiCadPanelAssyFG
 
                         if (!MatchFound_Local)
                         {
-                            // No matching designator was found in the placements list.
+                            // No matching designator was found in the placements list
                         }
                     }
 
                     if (MatchFound_DataLine)
                     {
+                        // If any match has been found in the dataline, add it to the output BOM
                         tempBOM.BOMData.Add(outputBomDataLine.LCSC_PN, outputBomDataLine);
                     }
                     else
                     {
-                        // No matching designator from the BOM line was found in the placements list.
+                        // No matching designator from the BOM line was found in the placements list
                     }
                 }
 
                 if (MatchFound_FullBOM)
                 {
+                    // A full BOM has been completed. Merge it with the existing BOM to simplify it
                     PanelBOM.MergeFile(tempBOM);
 
+                    // Increment number of unique designs to recieve new suffix for the next iteration
                     uniqueDesigns++;
                 }
                 else
@@ -187,37 +239,55 @@ namespace KiCadPanelAssyFG
             }
         }
 
+        /// <summary>
+        /// Add a list of designs to the current output BOM and placement file.
+        /// </summary>
+        /// <param name="designs">List of designs that are to be added.</param>
         public void addDesigns(List<DesignInfo> designs)
         {
+            // Iterate through all designs
             foreach (DesignInfo design in designs)
             {
                 this.AddDesign(design);
             }
         }
 
+        /// <summary>
+        /// Update the datagridviews from the export BOM and placements.
+        /// </summary>
         public void UpdateTables()
         {
+            // Update BOM table
+            // Clear existing data from the BOM table
             BOMTable.Rows.Clear();
+
+            // Iterate through the BOM and add all data lines
             foreach (string bomKey in PanelBOM.BOMData.Keys)
             {
-                string designatorsString = "";
-
+                // Generate reference designators string
+                string referencesString = "";
                 for (int i = 0; i < PanelBOM.BOMData[bomKey].References.Count; i++)
                 {
-                    if (i > 0) designatorsString += ", ";
-                    designatorsString += PanelBOM.BOMData[bomKey].References[i];
+                    if (i > 0) referencesString += ", ";
+                    referencesString += PanelBOM.BOMData[bomKey].References[i];
                 }
 
+                // Add row data
                 BOMTable.Rows.Add(
                     PanelBOM.BOMData[bomKey].Value,
-                    designatorsString,
+                    referencesString,
                     PanelBOM.BOMData[bomKey].Footprint,
                     PanelBOM.BOMData[bomKey].LCSC_PN);
             }
 
+            // Update placements table
+            // Clear existing data from the placements table
             PlacementsTable.Rows.Clear();
+
+            // Iterate through all placements and add all data lines
             foreach (PlacementDataLine placementDataLine in PanelPlacements.Values)
             {
+                // Add row data
                 PlacementsTable.Rows.Add(
                     placementDataLine.Reference,
                     placementDataLine.Value,
@@ -227,7 +297,14 @@ namespace KiCadPanelAssyFG
                     placementDataLine.Rotation.ToString());
             }
         }
+        #endregion
 
+        //   ---   Private Methods   ---
+        #region PRIVATE_METHODS
+        /// <summary>
+        /// Method used to get the current design suffix based on the number of unique designs existing.
+        /// </summary>
+        /// <returns>String unique to the design number.</returns>
         private string GetCurrentDesignSuffix()
         {
             string suffix = "";
@@ -239,37 +316,14 @@ namespace KiCadPanelAssyFG
             }
             return suffix;
         }
+        #endregion
 
-        private void topOutlineColorTextbox_DoubleClick(object sender, EventArgs e)
-        {
-            ColorDialog colorDialog = new ColorDialog
-            {
-                Color = TopOutlineColor
-            };
-
-            if (colorDialog.ShowDialog() == DialogResult.OK)
-            {
-                TopOutlineColor = colorDialog.Color;
-                PlacementPreviewPanel.Refresh();
-            }
-        }
-
-        private void bottomOutlineColorTextbox_DoubleClick(object sender, EventArgs e)
-        {
-            ColorDialog colorDialog = new ColorDialog
-            {
-                Color = BottomOutlineColor
-            };
-
-            if (colorDialog.ShowDialog() == DialogResult.OK)
-            {
-                BottomOutlineColor = colorDialog.Color;
-                PlacementPreviewPanel.Refresh();
-            }
-        }
-
+        //   ---   Event Callback Methods   ---
+        #region EVENT_CALLBACK_METHODS
+        #region FORM_EVENTS
         private void ExportForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            // Save all user variables to the settings file before the form is closed
             Properties.Settings.Default.FootprintDirs = fpDirsTextbox.Text;
             Properties.Settings.Default.UseSeparatePlacementFiles = separateFilesCheckbox.Checked;
             Properties.Settings.Default.TopOutlineColor = TopOutlineColor;
@@ -277,20 +331,164 @@ namespace KiCadPanelAssyFG
             Properties.Settings.Default.BackgroundOpacity = bgOpacityTrackbar.Value;
             Properties.Settings.Default.Save();
         }
+        #endregion
+
+        #region PAINT_EVENTS
+        private void PlacementPreviewPanel_Paint(object sender, PaintEventArgs e)
+        {
+            Panel senderPanel = (Panel)sender;
+
+            // Fill Background
+            e.Graphics.Clear(Color.Black);
+
+            // Check if any footprints are loaded
+            if (FootprintsLoaded)
+            {
+                // Calculate scaling and movement to resize and center the preview appropriately
+                float boundsWidth = (float)senderPanel.Size.Width - 20.0f;
+                float boundsHeight = (float)senderPanel.Size.Height - 20.0f;
+
+                // Check if opacity to ignore shape fills
+                bool fillPolygons = bgOpacityTrackbar.Value > 0;
+
+                // Base transform vector for centering the outlines with a margin of 10px
+                PointF transformVec = new PointF(10.0f, 10.0f);
+
+                float previewScalingFactor = 1.0f;
+
+                // Check if width or height is the limiting factor for the scaling
+                if ((boundsWidth / boundsHeight) > (PreviewSize.Width / PreviewSize.Height))
+                {
+                    // Height is the limiting factor, calculate the scaling factor
+                    previewScalingFactor = boundsHeight / PreviewSize.Height;
+
+                    // Calculate the X offset needed to center the preview
+                    transformVec.X += (boundsWidth - previewScalingFactor * PreviewSize.Width) / 2;
+                }
+                else
+                {
+                    // Width is the limiting factor, calculate the scaling factor
+                    previewScalingFactor = boundsWidth / PreviewSize.Width;
+
+                    // Calculate the Y offset needed to center the preview
+                    transformVec.Y += (boundsHeight - previewScalingFactor * PreviewSize.Height) / 2;
+                }
+
+                // Create pen and brush variable for drawing the part outlines
+                using (Pen TopOutlinePen = new Pen(TopOutlineColor),
+                    BottomOutlinePen = new Pen(BottomOutlineColor))
+                using (Brush TopFillBrush = new SolidBrush(TopOutlineFillColor),
+                    BottomFillBrush = new SolidBrush(BottomOutlineFillColor))
+                {
+                    // Interate through all placements
+                    foreach (string placementKey in PanelPlacements.Keys)
+                    {
+                        PlacementDataLine refDataLine = PanelPlacements[placementKey];
+                        KiCadFootprintData refFootprintData = refDataLine.FootprintData;
+
+                        // Check if placement side is valid and visible
+                        if (((refDataLine.Side == PlacementSide.Top) && topVisibleCheckbox.Checked) || ((refDataLine.Side == PlacementSide.Bottom) && bottomVisibleCheckbox.Checked))
+                        {
+                            // Select appropriate brushes
+                            Pen OutlinePen = (refDataLine.Side == PlacementSide.Top) ? TopOutlinePen : BottomOutlinePen;
+                            Brush FillBrush = (refDataLine.Side == PlacementSide.Top) ? TopFillBrush : BottomFillBrush;
+
+                            if (refFootprintData.outlineIsClosedPolygonalChain)
+                            {
+                                // Outline is a closed polygonal chain
+                                List<PointF> scaledPoints = Util.ScalePosTransformPoints(refFootprintData.OutlinePolyPoints, transformVec, previewScalingFactor);
+
+                                // Fill polygon if the opacity is above 0
+                                if (fillPolygons) e.Graphics.FillPolygon(FillBrush, scaledPoints.ToArray());
+
+                                // Draw polygon outline
+                                e.Graphics.DrawPolygon(OutlinePen, scaledPoints.ToArray());
+                            }
+                            else
+                            {
+                                // Outline is not a closed polygonal chain or contains stub or isolated segments
+                                List<LineF> scaledLines = Util.ScalePosTransformLines(refFootprintData.OutlineSegments, transformVec, previewScalingFactor);
+
+                                // Draw all outline segments as individual segments
+                                foreach (LineF refLine in scaledLines)
+                                {
+                                    // Draw individual line
+                                    e.Graphics.DrawLine(OutlinePen, refLine.StartPoint, refLine.EndPoint);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region USER_INTERACTION_EVENTS
+        private void topOutlineColorTextbox_DoubleClick(object sender, EventArgs e)
+        {
+            // Open color dialog to allow the user to select a new color
+            using (ColorDialog colorDialog = new ColorDialog())
+            {
+                colorDialog.Color = TopOutlineColor;
+
+                if (colorDialog.ShowDialog() == DialogResult.OK)
+                {
+                    // Color selection successful, update top outline color
+                    TopOutlineColor = colorDialog.Color;
+
+                    // Update preview panel
+                    PlacementPreviewPanel.Refresh();
+                }
+            }
+        }
+
+        private void bottomOutlineColorTextbox_DoubleClick(object sender, EventArgs e)
+        {
+            // Open color dialog to allow the user to select a new color
+            using (ColorDialog colorDialog = new ColorDialog())
+            {
+                colorDialog.Color = TopOutlineColor;
+
+                if (colorDialog.ShowDialog() == DialogResult.OK)
+                {
+                    // Color selection successful, update bottom outline color
+                    BottomOutlineColor = colorDialog.Color;
+
+                    // Update preview panel
+                    PlacementPreviewPanel.Refresh();
+                }
+            }
+        }
+
+        private void VisibilityCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            // Update placements preview
+            PlacementPreviewPanel.Refresh();
+        }
+
+        private void bgOppacityTrackbar_Scroll(object sender, EventArgs e)
+        {
+            // Refresh placements preview
+            PlacementPreviewPanel.Refresh();
+        }
 
         private void bReloadFootprints_Click(object sender, EventArgs e)
         {
             bool AllFootprintsFound = true;
 
+            // Iterate through all BOM data lines
             foreach (BOMDataLine bomDataLine in PanelBOM.BOMData.Values)
             {
                 string fullFootprintDir = "";
                 bool dirFound = false;
 
+                // Iterate through all footprint directories to search for matching footprints
                 foreach (string footprintDirectory in KiCadFootprintDirs)
                 {
+                    // Generate footprint path from directory and footprint name
                     fullFootprintDir = (footprintDirectory.Trim().Replace("/", "\\") + "\\" + KiCadFootprintUtil.GetRelativePathFromFootprintName(bomDataLine.Footprint)).Replace("\\\\", "\\");
 
+                    // Check if footprint exists
                     if (File.Exists(fullFootprintDir))
                     {
                         dirFound = true;
@@ -300,8 +498,10 @@ namespace KiCadPanelAssyFG
 
                 if (dirFound)
                 {
+                    // matching footprint file found
                     KiCadFootprintData partFootprintData = KiCadFootprintParser.ParseKiCadFootprint(fullFootprintDir);
 
+                    // Iterate through all reference designators from this BOM line and uppdate matching placements
                     foreach (string reference in bomDataLine.References)
                     {
                         if (PanelPlacements.ContainsKey(reference))
@@ -310,6 +510,7 @@ namespace KiCadPanelAssyFG
                 }
                 else
                 {
+                    // Some footprints are missing
                     AllFootprintsFound = false;
                     continue;
                 }
@@ -317,8 +518,10 @@ namespace KiCadPanelAssyFG
 
             if (!AllFootprintsFound)
             {
+                // Not all footprints were found, ask user if he still wants to continue
                 if (MessageBox.Show("Not all footprints were found press \"OK\" to continue, press \"cancel\" to abort.", "Footprints missing", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) != DialogResult.OK)
                 {
+                    // User chose to abort
                     return;
                 }
             }
@@ -334,7 +537,7 @@ namespace KiCadPanelAssyFG
                 PlacementDataLine refDataLine = PanelPlacements[placementKey];
                 KiCadFootprintData refFootprintData = refDataLine.FootprintData;
 
-                // Flip position y axis
+                // Flip position Y values
                 PointF graphicalFootprintPos = new PointF
                 {
                     X = refDataLine.Position.X,
@@ -398,81 +601,8 @@ namespace KiCadPanelAssyFG
                 }
             }
 
+            // All footprints were loaded, refresh placements preview
             FootprintsLoaded = true;
-            PlacementPreviewPanel.Refresh();
-        }
-
-        private void PlacementPreviewPanel_Paint(object sender, PaintEventArgs e)
-        {
-            Panel senderPanel = (Panel)sender;
-
-            // Fill Background
-            e.Graphics.Clear(Color.Black);
-
-            if (FootprintsLoaded)
-            {
-                // Calculate scaling and movement to resize and center the preview appropriately
-                float boundsWidth = (float)senderPanel.Size.Width - 20.0f;
-                float boundsHeight = (float)senderPanel.Size.Height - 20.0f;
-
-                PointF transformVec = new PointF(10.0f, 10.0f);
-
-                float previewScalingFactor = 1.0f;
-
-                if ((boundsWidth / boundsHeight) > (PreviewSize.Width / PreviewSize.Height))
-                {
-                    previewScalingFactor = boundsHeight / PreviewSize.Height;
-                    transformVec.X += (boundsWidth - previewScalingFactor * PreviewSize.Width) / 2;
-                }
-                else
-                {
-                    previewScalingFactor = boundsWidth / PreviewSize.Width;
-                    transformVec.Y += (boundsHeight - previewScalingFactor * PreviewSize.Height) / 2;
-                }
-
-                using (Pen TopOutlinePen = new Pen(TopOutlineColor),
-                    BottomOutlinePen = new Pen(BottomOutlineColor))
-                using (Brush TopFillBrush = new SolidBrush(TopOutlineFillColor),
-                    BottomFillBrush = new SolidBrush(BottomOutlineFillColor))
-                {
-                    foreach (string placementKey in PanelPlacements.Keys)
-                    {
-                        PlacementDataLine refDataLine = PanelPlacements[placementKey];
-                        KiCadFootprintData refFootprintData = refDataLine.FootprintData;
-
-                        // Check if placement side is valid and visible
-                        if (((refDataLine.Side == PlacementSide.Top) && topVisibleCheckbox.Checked) || ((refDataLine.Side == PlacementSide.Bottom) && bottomVisibleCheckbox.Checked))
-                        {
-                            // Select appropriate brushes
-                            Pen OutlinePen = (refDataLine.Side == PlacementSide.Top) ? TopOutlinePen : BottomOutlinePen;
-                            Brush FillBrush = (refDataLine.Side == PlacementSide.Top) ? TopFillBrush : BottomFillBrush;
-
-                            if (refFootprintData.outlineIsClosedPolygonalChain)
-                            {
-                                // Outline is a closed polygonal chain
-                                List<PointF> scaledPoints = Util.ScalePosTransformPoints(refFootprintData.OutlinePolyPoints, transformVec, previewScalingFactor);
-
-                                e.Graphics.FillPolygon(FillBrush, scaledPoints.ToArray());
-                                e.Graphics.DrawPolygon(OutlinePen, scaledPoints.ToArray());
-                            }
-                            else
-                            {
-                                // Outline is not a closed polygonal chain or contains stub or isolated segments
-                                List<LineF> scaledLines = Util.ScalePosTransformLines(refFootprintData.OutlineSegments, transformVec, previewScalingFactor);
-
-                                foreach (LineF refLine in scaledLines)
-                                {
-                                    e.Graphics.DrawLine(OutlinePen, refLine.StartPoint, refLine.EndPoint);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void VisibilityCheckbox_CheckedChanged(object sender, EventArgs e)
-        {
             PlacementPreviewPanel.Refresh();
         }
 
@@ -482,6 +612,7 @@ namespace KiCadPanelAssyFG
 
             string selectedOutputPath = "";
 
+            // Check if project name is missing
             if (projectName == "")
             {
                 MessageBox.Show("Please enter a project name.", "Project Name Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -495,9 +626,12 @@ namespace KiCadPanelAssyFG
                 return;
             }
 
+            // Open folder browser dialog for the file output directory
             using (FolderBrowserDialog dialog = new FolderBrowserDialog())
             {
-                dialog.Description = "Select a folder to save files in";
+                dialog.Description = "Select Output Folder to Save Files in";
+                dialog.UseDescriptionForTitle = true;
+
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
                     selectedOutputPath = dialog.SelectedPath;
@@ -508,9 +642,10 @@ namespace KiCadPanelAssyFG
                 }
             }
 
+            // Check if output directory is valid
             if (!Directory.Exists(selectedOutputPath))
             {
-                MessageBox.Show("The selected output directory does not seem to exist, please try again.", "Invalid output directory", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("The selected output directory does not exist, please try again.", "Invalid Output Directory", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
@@ -519,12 +654,14 @@ namespace KiCadPanelAssyFG
             // Generate BOM file
             filesGenerator.ExportToFile(projectName + "_BOM.csv", selectedOutputPath, PanelBOM);
 
+            // Generate placement file from the placements dictionary to use for the export function
             PlacementFile tempPanelPlacementFile = new PlacementFile();
             foreach (string placementKey in PanelPlacements.Keys)
             {
                 tempPanelPlacementFile.PlacementData.Add(PanelPlacements[placementKey]);
             }
 
+            // Check if the user wants separate files for top and bottom layer
             if (separateFilesCheckbox.Checked)
             {
                 // Generate top placement file
@@ -538,10 +675,7 @@ namespace KiCadPanelAssyFG
                 filesGenerator.ExportToFile(projectName + "_pos.csv", selectedOutputPath, tempPanelPlacementFile);
             }
         }
-
-        private void bgOppacityTrackbar_Scroll(object sender, EventArgs e)
-        {
-            PlacementPreviewPanel.Refresh();
-        }
+        #endregion
+        #endregion
     }
 }
