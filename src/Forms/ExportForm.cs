@@ -287,6 +287,8 @@ namespace KiCadPanelAssyFG
             // Iterate through all placements and add all data lines
             foreach (PlacementDataLine placementDataLine in PanelPlacements.Values)
             {
+                string sideStr = ((placementDataLine.Side == PlacementSide.Top) ? "Top" : ((placementDataLine.Side == PlacementSide.Bottom) ? "Bottom" : "Undefined"));
+
                 // Add row data
                 PlacementsTable.Rows.Add(
                     placementDataLine.Reference,
@@ -294,7 +296,8 @@ namespace KiCadPanelAssyFG
                     placementDataLine.Footprint,
                     placementDataLine.Position.X.ToString(),
                     placementDataLine.Position.Y.ToString(),
-                    placementDataLine.Rotation.ToString());
+                    placementDataLine.Rotation.ToString(),
+                    sideStr);
             }
         }
 
