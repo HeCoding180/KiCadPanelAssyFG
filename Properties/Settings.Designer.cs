@@ -82,5 +82,17 @@ namespace KiCadPanelAssyFG.Properties {
                 this["BackgroundOpacity"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Yellow")]
+        public global::System.Drawing.Color SelectionColor {
+            get {
+                return ((global::System.Drawing.Color)(this["SelectionColor"]));
+            }
+            set {
+                this["SelectionColor"] = value;
+            }
+        }
     }
 }

@@ -37,6 +37,8 @@ namespace KiCadPanelAssyFG
         /// True once the footprints have been loaded once.
         /// </summary>
         public bool FootprintsLoaded { private set; get; }
+
+        public List<string> SelectedReferences { private set; get; }
         #endregion
 
         //   ---   Private Properties   ---
@@ -57,6 +59,7 @@ namespace KiCadPanelAssyFG
 
         private Color _TopOutlineColor;
         private Color _BottomOutlineColor;
+        private Color _SelectionHighlightColor;
 
         /// <summary>
         /// Property containing the color used to display parts placed on the top side of the PCB.
@@ -92,6 +95,25 @@ namespace KiCadPanelAssyFG
             get
             {
                 return _BottomOutlineColor;
+            }
+        }
+
+        /// <summary>
+        /// Property containing the color used to display parts placed on the bottom side of the PCB.
+        /// Automatically updates the selection color textbox's colors and text.
+        /// </summary>
+        private Color SelectionHighlightColor
+        {
+            set
+            {
+                _SelectionHighlightColor = value;
+                selectionColorTextbox.BackColor = value;
+                selectionColorTextbox.ForeColor = (Math.Max(Math.Max(value.R, value.G), value.B) > 128) ? Color.Black : Color.White;
+                selectionColorTextbox.Text = ColorTranslator.ToHtml(value);
+            }
+            get
+            {
+                return _SelectionHighlightColor;
             }
         }
 
@@ -135,12 +157,15 @@ namespace KiCadPanelAssyFG
 
             FootprintsLoaded = false;
 
+            SelectedReferences = new List<string>();
+
             // Load settings from settings file
             Properties.Settings.Default.Reload();
             fpDirsTextbox.Text = Properties.Settings.Default.FootprintDirs;
             separateFilesCheckbox.Checked = Properties.Settings.Default.UseSeparatePlacementFiles;
             TopOutlineColor = Properties.Settings.Default.TopOutlineColor;
             BottomOutlineColor = Properties.Settings.Default.BottomOutlineColor;
+            SelectionHighlightColor = Properties.Settings.Default.SelectionColor;
             bgOpacityTrackbar.Value = Properties.Settings.Default.BackgroundOpacity;
         }
 
@@ -239,11 +264,23 @@ namespace KiCadPanelAssyFG
             }
         }
 
+        public void SaveSettings()
+        {
+            // Save all user variables to the settings file before the form is closed
+            Properties.Settings.Default.FootprintDirs = fpDirsTextbox.Text;
+            Properties.Settings.Default.UseSeparatePlacementFiles = separateFilesCheckbox.Checked;
+            Properties.Settings.Default.TopOutlineColor = TopOutlineColor;
+            Properties.Settings.Default.BottomOutlineColor = BottomOutlineColor;
+            Properties.Settings.Default.SelectionColor = SelectionHighlightColor;
+            Properties.Settings.Default.BackgroundOpacity = bgOpacityTrackbar.Value;
+            Properties.Settings.Default.Save();
+        }
+
         /// <summary>
         /// Add a list of designs to the current output BOM and placement file.
         /// </summary>
         /// <param name="designs">List of designs that are to be added.</param>
-        public void addDesigns(List<DesignInfo> designs)
+        public void AddDesigns(List<DesignInfo> designs)
         {
             // Iterate through all designs
             foreach (DesignInfo design in designs)
@@ -468,12 +505,7 @@ namespace KiCadPanelAssyFG
         private void ExportForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             // Save all user variables to the settings file before the form is closed
-            Properties.Settings.Default.FootprintDirs = fpDirsTextbox.Text;
-            Properties.Settings.Default.UseSeparatePlacementFiles = separateFilesCheckbox.Checked;
-            Properties.Settings.Default.TopOutlineColor = TopOutlineColor;
-            Properties.Settings.Default.BottomOutlineColor = BottomOutlineColor;
-            Properties.Settings.Default.BackgroundOpacity = bgOpacityTrackbar.Value;
-            Properties.Settings.Default.Save();
+            SaveSettings();
         }
         #endregion
 
@@ -520,7 +552,8 @@ namespace KiCadPanelAssyFG
 
                 // Create pen and brush variable for drawing the part outlines
                 using (Pen TopOutlinePen = new Pen(TopOutlineColor),
-                    BottomOutlinePen = new Pen(BottomOutlineColor))
+                    BottomOutlinePen = new Pen(BottomOutlineColor),
+                    SelectionOutlinePen = new Pen(SelectionHighlightColor))
                 using (Brush TopFillBrush = new SolidBrush(TopOutlineFillColor),
                     BottomFillBrush = new SolidBrush(BottomOutlineFillColor))
                 {
@@ -534,7 +567,7 @@ namespace KiCadPanelAssyFG
                         if (((refDataLine.Side == PlacementSide.Top) && topVisibleCheckbox.Checked) || ((refDataLine.Side == PlacementSide.Bottom) && bottomVisibleCheckbox.Checked))
                         {
                             // Select appropriate brushes
-                            Pen OutlinePen = (refDataLine.Side == PlacementSide.Top) ? TopOutlinePen : BottomOutlinePen;
+                            Pen OutlinePen = (SelectedReferences.Contains(refDataLine.Reference) ? SelectionOutlinePen : ((refDataLine.Side == PlacementSide.Top) ? TopOutlinePen : BottomOutlinePen));
                             Brush FillBrush = (refDataLine.Side == PlacementSide.Top) ? TopFillBrush : BottomFillBrush;
 
                             if (refFootprintData.outlineIsClosedPolygonalChain)
@@ -597,6 +630,24 @@ namespace KiCadPanelAssyFG
                 {
                     // Color selection successful, update bottom outline color
                     BottomOutlineColor = colorDialog.Color;
+
+                    // Update preview panel
+                    PlacementPreviewPanel.Refresh();
+                }
+            }
+        }
+
+        private void selectionColorTextbox_DoubleClick(object sender, EventArgs e)
+        {
+            // Open color dialog to allow the user to select a new color
+            using (ColorDialog colorDialog = new ColorDialog())
+            {
+                colorDialog.Color = SelectionHighlightColor;
+
+                if (colorDialog.ShowDialog() == DialogResult.OK)
+                {
+                    // Color selection successful, update bottom outline color
+                    SelectionHighlightColor = colorDialog.Color;
 
                     // Update preview panel
                     PlacementPreviewPanel.Refresh();
@@ -689,6 +740,19 @@ namespace KiCadPanelAssyFG
                 // Generate combined top and bottom placement file
                 filesGenerator.ExportToFile(projectName + "_pos.csv", selectedOutputPath, tempPanelPlacementFile);
             }
+        }
+
+        private void PlacementsTable_SelectionChanged(object sender, EventArgs e)
+        {
+            // Update selected references list.
+            SelectedReferences.Clear();
+            foreach (DataGridViewCell cell in PlacementsTable.SelectedCells)
+            {
+                SelectedReferences.Add(PlacementsTable.Rows[cell.RowIndex].Cells[0].Value.ToString());
+            }
+
+            // Refresh placements preview
+            PlacementPreviewPanel.Refresh();
         }
         #endregion
         #endregion
