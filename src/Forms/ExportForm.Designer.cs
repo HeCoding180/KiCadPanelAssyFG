@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
             DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
@@ -76,6 +77,7 @@
             lTopComponents = new Label();
             lGeneralProperties = new Label();
             bExport = new Button();
+            PreviewBlinkTimer = new System.Windows.Forms.Timer(components);
             ((System.ComponentModel.ISupportInitialize)MainSplitContainer).BeginInit();
             MainSplitContainer.Panel1.SuspendLayout();
             MainSplitContainer.Panel2.SuspendLayout();
@@ -593,6 +595,11 @@
             bExport.UseVisualStyleBackColor = false;
             bExport.Click += bExport_Click;
             // 
+            // PreviewBlinkTimer
+            // 
+            PreviewBlinkTimer.Interval = 500;
+            PreviewBlinkTimer.Tick += PreviewBlinkTimer_Tick;
+            // 
             // ExportForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -673,5 +680,6 @@
         private Label lFillOpacity;
         private TextBox selectionColorTextbox;
         private Label lSelectionColor;
+        private System.Windows.Forms.Timer PreviewBlinkTimer;
     }
 }

@@ -221,5 +221,56 @@ namespace KiCadPanelAssyFG
 
             FootprintData = new KiCadFootprintData();
         }
+
+        public void PaintFootprintPreview(Graphics refGraphics, Pen outlinePen, float scalingFactor, PointF TransformVec)
+        {
+            if (FootprintData.outlineIsClosedPolygonalChain)
+            {
+                // Outline is a closed polygonal chain
+                PointF[] scaledPoints = Util.ScalePosTransformPoints(FootprintData.OutlinePolyPoints, TransformVec, scalingFactor).ToArray();
+
+                // Draw polygon outline
+                refGraphics.DrawPolygon(outlinePen, scaledPoints);
+            }
+            else
+            {
+                // Outline is not a closed polygonal chain or contains stub or isolated segments
+                List<LineF> scaledLines = Util.ScalePosTransformLines(FootprintData.OutlineSegments, TransformVec, scalingFactor);
+
+                // Draw all outline segments as individual segments
+                foreach (LineF refLine in scaledLines)
+                {
+                    // Draw individual line
+                    refGraphics.DrawLine(outlinePen, refLine.StartPoint, refLine.EndPoint);
+                }
+            }
+        }
+
+        public void PaintFootprintPreview(Graphics refGraphics, Pen outlinePen, Brush fillBrush, float scalingFactor, PointF TransformVec)
+        {
+            if (FootprintData.outlineIsClosedPolygonalChain)
+            {
+                // Outline is a closed polygonal chain
+                PointF[] scaledPoints = Util.ScalePosTransformPoints(FootprintData.OutlinePolyPoints, TransformVec, scalingFactor).ToArray();
+
+                // Fill polygon if the opacity is above 0
+                refGraphics.FillPolygon(fillBrush, scaledPoints);
+
+                // Draw polygon outline
+                refGraphics.DrawPolygon(outlinePen, scaledPoints);
+            }
+            else
+            {
+                // Outline is not a closed polygonal chain or contains stub or isolated segments
+                List<LineF> scaledLines = Util.ScalePosTransformLines(FootprintData.OutlineSegments, TransformVec, scalingFactor);
+
+                // Draw all outline segments as individual segments
+                foreach (LineF refLine in scaledLines)
+                {
+                    // Draw individual line
+                    refGraphics.DrawLine(outlinePen, refLine.StartPoint, refLine.EndPoint);
+                }
+            }
+        }
     }
 }

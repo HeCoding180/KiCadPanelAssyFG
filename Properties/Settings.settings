@@ -3,7 +3,7 @@
   <Profiles />
   <Settings>
     <Setting Name="FootprintDirs" Type="System.String" Scope="User">
-      <Value Profile="(Default)">asdf</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="UseSeparatePlacementFiles" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>

@@ -38,6 +38,9 @@ namespace KiCadPanelAssyFG
         /// </summary>
         public bool FootprintsLoaded { private set; get; }
 
+        /// <summary>
+        /// List of all footprints that are selected in the placements table.
+        /// </summary>
         public List<string> SelectedReferences { private set; get; }
         #endregion
 
@@ -139,15 +142,33 @@ namespace KiCadPanelAssyFG
                 return Color.FromArgb((int)Math.Round(255.0 * (double)bgOpacityTrackbar.Value / 100), BottomOutlineColor);
             }
         }
+
+        /// <summary>
+        /// Boolean used to store the information whether the blinking of the selection highlighting is currently on or off.
+        /// </summary>
+        private bool PreviewHighlightBlinkOn { set; get; }
+
+        /// <summary>
+        /// Previous scaling factor of the preview.
+        /// </summary>
+        private float PrevPreveiwScalingFactor { set; get; }
+
+        /// <summary>
+        /// Previous transform vector of the preview.
+        /// </summary>
+        private PointF PrevTransformVec { set; get; }
+
+        /// <summary>
+        /// Flag that contains if the next paint event of the panel is a partial repaint (true; only the selection highlighting has changed) or a full repaint (false; resizing of the panel or something else has changed)
+        /// </summary>
+        private bool DoPartialRepaint { set; get; }
+
+        private List<string> PrevSelectedReferences { set; get; }
         #endregion
 
         //   ---   Constructor   ---
         public ExportForm(FileOverviewForm sender)
         {
-            InitializeComponent();
-
-            this.FormClosing += sender.ExportForm_Closing;
-
             PanelBOM = new BOMFile();
             PanelPlacements = new Dictionary<string, PlacementDataLine>();
 
@@ -157,7 +178,16 @@ namespace KiCadPanelAssyFG
 
             FootprintsLoaded = false;
 
+            PreviewHighlightBlinkOn = true;
+
+            DoPartialRepaint = false;
+
             SelectedReferences = new List<string>();
+            PrevSelectedReferences = new List<string>();
+
+            InitializeComponent();
+
+            this.FormClosing += sender.ExportForm_Closing;
 
             // Load settings from settings file
             Properties.Settings.Default.Reload();
@@ -497,6 +527,62 @@ namespace KiCadPanelAssyFG
             }
             return suffix;
         }
+
+        /// <summary>
+        /// Function used to partially repaint the preview.
+        /// </summary>
+        private void Preview_DoPartialRepaint()
+        {
+            // Check if footprints are loaded
+            if (FootprintsLoaded)
+            {
+                using (Graphics previewGraphics = PlacementPreviewPanel.CreateGraphics())
+                using (Pen TopOutlinePen = new Pen(TopOutlineColor),
+                    BottomOutlinePen = new Pen(BottomOutlineColor),
+                    SelectionOutlinePen = new Pen(SelectionHighlightColor))
+                {
+                    foreach (string reference in SelectedReferences)
+                    {
+                        PlacementDataLine refDataLine = PanelPlacements[reference];
+
+                        // Remove the handled reference from the previously selected references list if it was previously selected
+                        if (PrevSelectedReferences.Contains(reference)) PrevSelectedReferences.Remove(reference);
+
+                        // Check if placement side is valid and visible
+                        if (((refDataLine.Side == PlacementSide.Top) && topVisibleCheckbox.Checked)
+                            || ((refDataLine.Side == PlacementSide.Bottom) && bottomVisibleCheckbox.Checked))
+                        {
+                            refDataLine.PaintFootprintPreview(previewGraphics,
+                                (PreviewHighlightBlinkOn ? SelectionOutlinePen : ((refDataLine.Side == PlacementSide.Top) ? TopOutlinePen : BottomOutlinePen)),
+                                PrevPreveiwScalingFactor,
+                                PrevTransformVec);
+                        }
+                    }
+
+                    // Paint footprints that got de-selected in their top/bottom color
+                    if (PrevSelectedReferences.Count > 0)
+                    {
+                        foreach (string reference in PrevSelectedReferences)
+                        {
+                            PlacementDataLine refDataLine = PanelPlacements[reference];
+
+                            // Check if placement side is valid and visible
+                            if (((refDataLine.Side == PlacementSide.Top) && topVisibleCheckbox.Checked)
+                                || ((refDataLine.Side == PlacementSide.Bottom) && bottomVisibleCheckbox.Checked))
+                            {
+                                refDataLine.PaintFootprintPreview(previewGraphics,
+                                    (refDataLine.Side == PlacementSide.Top) ? TopOutlinePen : BottomOutlinePen,
+                                    PrevPreveiwScalingFactor,
+                                    PrevTransformVec);
+                            }
+                        }
+                    }
+                }
+
+                // Update list of previously selected footprints
+                PrevSelectedReferences = new List<string>(SelectedReferences);
+            }
+        }
         #endregion
 
         //   ---   Event Callback Methods   ---
@@ -514,12 +600,12 @@ namespace KiCadPanelAssyFG
         {
             Panel senderPanel = (Panel)sender;
 
-            // Fill Background
-            e.Graphics.Clear(Color.Black);
-
             // Check if any footprints are loaded
             if (FootprintsLoaded)
             {
+                // Fill Background
+                e.Graphics.Clear(Color.Black);
+
                 // Calculate scaling and movement to resize and center the preview appropriately
                 float boundsWidth = (float)senderPanel.Size.Width - 20.0f;
                 float boundsHeight = (float)senderPanel.Size.Height - 20.0f;
@@ -527,27 +613,22 @@ namespace KiCadPanelAssyFG
                 // Check if opacity to ignore shape fills
                 bool fillPolygons = bgOpacityTrackbar.Value > 0;
 
-                // Base transform vector for centering the outlines with a margin of 10px
-                PointF transformVec = new PointF(10.0f, 10.0f);
-
-                float previewScalingFactor = 1.0f;
-
                 // Check if width or height is the limiting factor for the scaling
                 if ((boundsWidth / boundsHeight) > (PreviewSize.Width / PreviewSize.Height))
                 {
                     // Height is the limiting factor, calculate the scaling factor
-                    previewScalingFactor = boundsHeight / PreviewSize.Height;
+                    PrevPreveiwScalingFactor = boundsHeight / PreviewSize.Height;
 
                     // Calculate the X offset needed to center the preview
-                    transformVec.X += (boundsWidth - previewScalingFactor * PreviewSize.Width) / 2;
+                    PrevTransformVec = new PointF(10.0f + (boundsWidth - PrevPreveiwScalingFactor * PreviewSize.Width) / 2, 10.0f);
                 }
                 else
                 {
                     // Width is the limiting factor, calculate the scaling factor
-                    previewScalingFactor = boundsWidth / PreviewSize.Width;
+                    PrevPreveiwScalingFactor = boundsWidth / PreviewSize.Width;
 
                     // Calculate the Y offset needed to center the preview
-                    transformVec.Y += (boundsHeight - previewScalingFactor * PreviewSize.Height) / 2;
+                    PrevTransformVec = new PointF(10.0f, 10.0f + (boundsHeight - PrevPreveiwScalingFactor * PreviewSize.Height) / 2);
                 }
 
                 // Create pen and brush variable for drawing the part outlines
@@ -561,42 +642,42 @@ namespace KiCadPanelAssyFG
                     foreach (string placementKey in PanelPlacements.Keys)
                     {
                         PlacementDataLine refDataLine = PanelPlacements[placementKey];
-                        KiCadFootprintData refFootprintData = refDataLine.FootprintData;
 
                         // Check if placement side is valid and visible
-                        if (((refDataLine.Side == PlacementSide.Top) && topVisibleCheckbox.Checked) || ((refDataLine.Side == PlacementSide.Bottom) && bottomVisibleCheckbox.Checked))
+                        if (((refDataLine.Side == PlacementSide.Top) && topVisibleCheckbox.Checked)
+                            || ((refDataLine.Side == PlacementSide.Bottom) && bottomVisibleCheckbox.Checked))
                         {
-                            // Select appropriate brushes
-                            Pen OutlinePen = (SelectedReferences.Contains(refDataLine.Reference) ? SelectionOutlinePen : ((refDataLine.Side == PlacementSide.Top) ? TopOutlinePen : BottomOutlinePen));
-                            Brush FillBrush = (refDataLine.Side == PlacementSide.Top) ? TopFillBrush : BottomFillBrush;
-
-                            if (refFootprintData.outlineIsClosedPolygonalChain)
-                            {
-                                // Outline is a closed polygonal chain
-                                List<PointF> scaledPoints = Util.ScalePosTransformPoints(refFootprintData.OutlinePolyPoints, transformVec, previewScalingFactor);
-
-                                // Fill polygon if the opacity is above 0
-                                if (fillPolygons) e.Graphics.FillPolygon(FillBrush, scaledPoints.ToArray());
-
-                                // Draw polygon outline
-                                e.Graphics.DrawPolygon(OutlinePen, scaledPoints.ToArray());
-                            }
+                            if (fillPolygons)
+                                refDataLine.PaintFootprintPreview(e.Graphics,
+                                    ((SelectedReferences.Contains(refDataLine.Reference) && PreviewHighlightBlinkOn) ? SelectionOutlinePen : ((refDataLine.Side == PlacementSide.Top) ? TopOutlinePen : BottomOutlinePen)),
+                                    (refDataLine.Side == PlacementSide.Top) ? TopFillBrush : BottomFillBrush,
+                                    PrevPreveiwScalingFactor,
+                                    PrevTransformVec);
                             else
-                            {
-                                // Outline is not a closed polygonal chain or contains stub or isolated segments
-                                List<LineF> scaledLines = Util.ScalePosTransformLines(refFootprintData.OutlineSegments, transformVec, previewScalingFactor);
-
-                                // Draw all outline segments as individual segments
-                                foreach (LineF refLine in scaledLines)
-                                {
-                                    // Draw individual line
-                                    e.Graphics.DrawLine(OutlinePen, refLine.StartPoint, refLine.EndPoint);
-                                }
-                            }
+                                refDataLine.PaintFootprintPreview(e.Graphics,
+                                    ((SelectedReferences.Contains(refDataLine.Reference) && PreviewHighlightBlinkOn) ? SelectionOutlinePen : ((refDataLine.Side == PlacementSide.Top) ? TopOutlinePen : BottomOutlinePen)),
+                                    PrevPreveiwScalingFactor,
+                                    PrevTransformVec);
                         }
                     }
                 }
             }
+            else
+            {
+                // Fill Background
+                e.Graphics.Clear(Color.Black);
+            }
+        }
+        #endregion
+
+        #region TIMER_EVENTS
+        private void PreviewBlinkTimer_Tick(object sender, EventArgs e)
+        {
+            // Invert blink on flag
+            PreviewHighlightBlinkOn = !PreviewHighlightBlinkOn;
+
+            // Update preview panel (partial repaint)
+            Preview_DoPartialRepaint();
         }
         #endregion
 
@@ -744,15 +825,32 @@ namespace KiCadPanelAssyFG
 
         private void PlacementsTable_SelectionChanged(object sender, EventArgs e)
         {
-            // Update selected references list.
+            // Clear selected references list
             SelectedReferences.Clear();
-            foreach (DataGridViewCell cell in PlacementsTable.SelectedCells)
+
+            if (PlacementsTable.SelectedCells.Count > 0)
             {
-                SelectedReferences.Add(PlacementsTable.Rows[cell.RowIndex].Cells[0].Value.ToString());
+                // Update selected references list
+                foreach (DataGridViewCell cell in PlacementsTable.SelectedCells)
+                {
+                    SelectedReferences.Add(PlacementsTable.Rows[cell.RowIndex].Cells[0].Value.ToString());
+                }
+
+                // (Re-) Start the blink timer
+                if (PreviewBlinkTimer.Enabled) PreviewBlinkTimer.Stop();
+                PreviewBlinkTimer.Start();
+
+                // Enable the blink on flag
+                PreviewHighlightBlinkOn = true;
+            }
+            else
+            {
+                // Stop the blink timer
+                PreviewBlinkTimer.Stop();
             }
 
-            // Refresh placements preview
-            PlacementPreviewPanel.Refresh();
+            // Refresh placements preview (partial repaint)
+            Preview_DoPartialRepaint();
         }
         #endregion
         #endregion

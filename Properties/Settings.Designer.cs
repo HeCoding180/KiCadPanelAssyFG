@@ -25,7 +25,7 @@ namespace KiCadPanelAssyFG.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("asdf")]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string FootprintDirs {
             get {
                 return ((string)(this["FootprintDirs"]));
