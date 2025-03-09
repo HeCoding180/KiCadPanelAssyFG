@@ -167,7 +167,7 @@ namespace KiCadPanelAssyFG
         #endregion
 
         //   ---   Constructor   ---
-        public ExportForm(FileOverviewForm sender)
+        public ExportForm(FileOverviewForm senderForm)
         {
             PanelBOM = new BOMFile();
             PanelPlacements = new Dictionary<string, PlacementDataLine>();
@@ -185,7 +185,7 @@ namespace KiCadPanelAssyFG
 
             InitializeComponent();
 
-            this.FormClosing += sender.ExportForm_Closing;
+            this.FormClosing += senderForm.ExportForm_Closing;
 
             // Load settings from settings file
             Properties.Settings.Default.Reload();

@@ -16,7 +16,7 @@ namespace KiCadPanelAssyFG
         private static readonly Rectangle IconButtonImageBounds = new Rectangle(7, 7, 16, 16);
 
         // Private variables
-        private ExportForm ExportWin;
+        private ExportForm? ExportWin;
         private bool ExportWinActive;
 
         public FileOverviewForm()
@@ -27,7 +27,7 @@ namespace KiCadPanelAssyFG
             placementsListBox.BackColor = WindowColors.NormalBGColor;
         }
 
-        public void ExportForm_Closing(object sender, FormClosingEventArgs e)
+        public void ExportForm_Closing(object? sender, FormClosingEventArgs e)
         {
             ExportWinActive = false;
         }
@@ -119,9 +119,11 @@ namespace KiCadPanelAssyFG
                 placementsListBox.SelectedIndex = -1;
                 placementsListBox.Items.Clear();
 
-                if (Designs[designListBox.GetItemText(designListBox.SelectedItem)].Placements.Count > 0)
+                string? selectedDesignKey = designListBox.GetItemText(designListBox.SelectedItem);
+
+                if ((selectedDesignKey != null) && (Designs[selectedDesignKey].Placements.Count > 0))
                 {
-                    foreach (string PlacementName in Designs[designListBox.GetItemText(designListBox.SelectedItem)].Placements.Keys)
+                    foreach (string PlacementName in Designs[selectedDesignKey].Placements.Keys)
                     {
                         placementsListBox.Items.Add(PlacementName);
                     }
@@ -172,44 +174,58 @@ namespace KiCadPanelAssyFG
 
         private void bRemoveDesign_Click(object sender, EventArgs e)
         {
-            if (designListBox.SelectedIndex >= 0)
+            if ((designListBox.SelectedIndex >= 0) && (designListBox.SelectedItem != null))
             {
-                Designs.Remove(designListBox.GetItemText(designListBox.SelectedItem));
-                designListBox.Items.Remove(designListBox.SelectedItem);
+                string? selectedDesign = designListBox.GetItemText(designListBox.SelectedItem);
 
-                if (designListBox.SelectedIndex == 0)
+                if (selectedDesign != null)
                 {
-                    bRemoveDesign.Enabled = false;
-                    bAddPlacements.Enabled = false;
+                    Designs.Remove(selectedDesign);
+                    designListBox.Items.Remove(designListBox.SelectedItem);
+
+                    if (designListBox.SelectedIndex == 0)
+                    {
+                        bRemoveDesign.Enabled = false;
+                        bAddPlacements.Enabled = false;
+                    }
                 }
             }
         }
 
         private void bAddPlacements_Click(object sender, EventArgs e)
         {
-            AddFileForm addFileForm = new AddFileForm("Add new Placement", "Placement Name", "Component Placement File (.csv)");
+            string? selectedDesignKey = designListBox.GetItemText(designListBox.SelectedItem);
 
-            if (addFileForm.ShowDialog() == DialogResult.OK)
+            if (selectedDesignKey != null)
             {
-                if (Designs[designListBox.GetItemText(designListBox.SelectedItem)].Placements.Keys.Contains(addFileForm.fileName))
-                {
-                    MessageBox.Show("A placement with the name \"" + addFileForm.fileName + "\" already exists in the selected design!", "Duplicate Placement", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-                else
-                {
-                    Designs[designListBox.GetItemText(designListBox.SelectedItem)].addPlacementInfo(new PlacementInfo(addFileForm.fileName, addFileForm.fileDir));
+                AddFileForm addFileForm = new AddFileForm("Add new Placement", "Placement Name", "Component Placement File (.csv)");
 
-                    placementsListBox.Items.Add(addFileForm.fileName);
+                if (addFileForm.ShowDialog() == DialogResult.OK)
+                {
+                    if (Designs[selectedDesignKey].Placements.Keys.Contains(addFileForm.fileName))
+                    {
+                        MessageBox.Show("A placement with the name \"" + addFileForm.fileName + "\" already exists in the selected design!", "Duplicate Placement", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                    else
+                    {
+                        Designs[selectedDesignKey].addPlacementInfo(new PlacementInfo(addFileForm.fileName, addFileForm.fileDir));
+
+                        placementsListBox.Items.Add(addFileForm.fileName);
+                    }
                 }
             }
         }
 
         private void bRemovePlacement_Click(object sender, EventArgs e)
         {
-            if ((placementsListBox.SelectedIndex >= 0) && (designListBox.SelectedIndex >= 0))
+            string? selectedDesignKey = designListBox.GetItemText(designListBox.SelectedItem);
+            object? selectedPlacementItem = placementsListBox.SelectedItem;
+            string? selectedPlacementKey = placementsListBox.GetItemText(selectedPlacementItem);
+
+            if ((selectedDesignKey != null) && (selectedPlacementItem != null) && (selectedPlacementKey != null) && (placementsListBox.SelectedIndex >= 0) && (designListBox.SelectedIndex >= 0))
             {
-                Designs[designListBox.GetItemText(designListBox.SelectedItem)].removePlacementInfo(placementsListBox.GetItemText(placementsListBox.SelectedItem));
-                placementsListBox.Items.Remove(placementsListBox.SelectedItem);
+                Designs[selectedDesignKey].removePlacementInfo(selectedPlacementKey);
+                placementsListBox.Items.Remove(selectedPlacementItem);
 
                 if (placementsListBox.SelectedIndex == 0)
                 {
