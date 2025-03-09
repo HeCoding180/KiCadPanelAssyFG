@@ -204,6 +204,7 @@
             BOMTable.RowHeadersVisible = false;
             BOMTable.Size = new Size(406, 448);
             BOMTable.TabIndex = 0;
+            BOMTable.SelectionChanged += BOMTable_SelectionChanged;
             // 
             // BomValueCol
             // 

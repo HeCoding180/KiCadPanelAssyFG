@@ -3,9 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -829,7 +831,11 @@ namespace KiCadPanelAssyFG
                 // Update selected references list
                 foreach (DataGridViewCell cell in PlacementsTable.SelectedCells)
                 {
-                    SelectedReferences.Add(PlacementsTable.Rows[cell.RowIndex].Cells[0].Value.ToString());
+                    string? rowReference = PlacementsTable.Rows[cell.RowIndex].Cells[0].Value.ToString();
+
+                    // Add row reference to selected references list
+                    if ((rowReference != null) && !SelectedReferences.Contains(rowReference))
+                        SelectedReferences.Add(rowReference);
                 }
 
                 // (Re-) Start the blink timer
@@ -847,6 +853,41 @@ namespace KiCadPanelAssyFG
 
             // Refresh placements preview (partial repaint)
             Preview_DoPartialRepaint();
+        }
+
+        private void BOMTable_SelectionChanged(object sender, EventArgs e)
+        {
+            // List of all selected references to be selected in the placements table
+            List<string> selectedReferences_Local = new List<string>();
+
+            // Iterate through all selected BOM cells
+            foreach (DataGridViewCell selectedBomCell in BOMTable.SelectedCells)
+            {
+                string? rawRefs = BOMTable.Rows[selectedBomCell.RowIndex].Cells[1].Value.ToString();
+
+                if (rawRefs != null)
+                {
+                    selectedReferences_Local.AddRange(rawRefs.Split(", "));
+                }
+            }
+
+            // Remove duplicates
+            selectedReferences_Local = selectedReferences_Local.Distinct().ToList();
+
+            // Iterate through all placements
+            foreach (DataGridViewRow placementRow in PlacementsTable.Rows)
+            {
+                string? rowReference = placementRow.Cells[0].Value.ToString();
+
+                if (rowReference != null)
+                {
+                    // Select row if row is selected, otherwise deselect it
+                    if (selectedReferences_Local.Remove(rowReference))
+                        placementRow.Selected = true;
+                    else
+                        placementRow.Selected = false;
+                }
+            }
         }
         #endregion
         #endregion
