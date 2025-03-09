@@ -159,10 +159,8 @@ namespace KiCadPanelAssyFG
         private PointF PrevTransformVec { set; get; }
 
         /// <summary>
-        /// Flag that contains if the next paint event of the panel is a partial repaint (true; only the selection highlighting has changed) or a full repaint (false; resizing of the panel or something else has changed)
+        /// List of previously selected references. Used to detect footprints that have been de-selected and remove highlighting on partial repaint of the preview.
         /// </summary>
-        private bool DoPartialRepaint { set; get; }
-
         private List<string> PrevSelectedReferences { set; get; }
         #endregion
 
@@ -179,8 +177,6 @@ namespace KiCadPanelAssyFG
             FootprintsLoaded = false;
 
             PreviewHighlightBlinkOn = true;
-
-            DoPartialRepaint = false;
 
             SelectedReferences = new List<string>();
             PrevSelectedReferences = new List<string>();
@@ -529,7 +525,7 @@ namespace KiCadPanelAssyFG
         }
 
         /// <summary>
-        /// Function used to partially repaint the preview.
+        /// Method used to partially repaint the preview. This method is used to update the preview when something in the highlighting has changed since highlighting does not affect the scaling and the backgrounds.
         /// </summary>
         private void Preview_DoPartialRepaint()
         {
